@@ -102,4 +102,4 @@ All custom styles can be modified in the `dashboard.css` file.
 This project is under the company of Regcris, Tmarks and Prestige.
 
 ### 👨🏻‍💻 Developers
-The developer for this project is @Aaron Rodriguez, @John Renzo G. Dacer, @Courtney Love Damasco.
+The developer for this project is [Aaron Rodriguez](https://www.facebook.com/aronrodriguez01101#), [John Renzo G. Dacer](https://www.facebook.com/huaxxxxiii),  [Courtney Love Damasco](https://www.facebook.com/courtney.damasco)
