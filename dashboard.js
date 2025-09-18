@@ -6,8 +6,15 @@ document.getElementById('previewBtn').addEventListener('click', function() {
         'prestige': 'PRESTIGE PROMOTIONS'
     };
 
+    const companyAddressMap = {
+        'trade-marketing': 'Room 306 3F CLMC Building, 259 EDSA, Barangay Wack-Wack Greenshills East, Mandaluyong City',
+        'regcris': '2768 Faraday, Makati City, 1234 Metro Manila',
+        'prestige': '3F Lupin Building, 2768 Faraday Street, Barangay San Isdro, Makati City'
+    };
+
     const companyKey = document.getElementById('company').value;
     const companyName = companyNameMap[companyKey];
+    const companyAddress = companyAddressMap[companyKey];
     const employmentType = document.getElementById('employment-type').value;
     const name = document.getElementById('name').value;
     const address = document.getElementById('address').value;
@@ -17,6 +24,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
     const position = document.getElementById('position').value;
     const startDate = new Date(document.getElementById('start-date').value);
     const client = document.getElementById('client').value;
+    const workLocation = document.getElementById('work-location').value;
     const employeeId = document.getElementById('employee-id').value;
     const salary = parseFloat(document.getElementById('salary').value).toFixed(2);
 
@@ -120,7 +128,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
         <div class="contract-container">
             <div class="company-header">
                 <p style="font-weight: bold;">${companyName}</p>
-                <p>Room 306 3F CLMC Building, 259 EDSA, Barangay Wack-Wack Greenshills East, Mandaluyong City</p>
+                <p>${companyAddress}</p>
             </div>
 
             <div class="contract-title">
@@ -150,7 +158,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
 
             <div class="section-block">
                 <p class="section-heading">Work Assignment and Location</p>
-                <p class="justified">Your initial work assignment will be at RS PuPuive, RE YUMANA However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.</p>
+                <p class="justified">Your initial work assignment will be at <strong><u>${workLocation}</u></strong>. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.</p>
             </div>
 
             <div class="section-block">
