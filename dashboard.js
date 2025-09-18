@@ -49,20 +49,20 @@ document.getElementById('previewBtn').addEventListener('click', function() {
     const formattedPhone = `0${phone.substring(0,3)}.${phone.substring(3,6)}.${phone.substring(6,10)}`;
 
     // This style block is injected into the preview to match the PDF's formatting
+    // --- STYLES ADJUSTED FOR 3-PAGE LAYOUT ---
     const styles = `
         <style>
             body {
                 font-family: serif;
-                font-size: 11pt;
-                line-height: 1.2;
+                font-size: 10.5pt; /* REDUCED FONT SIZE */
+                line-height: 1.15;   /* REDUCED LINE HEIGHT */
                 color: black;
             }
             .contract-container {
-                /* padding: 0.5in; */ /* <-- Removed to reduce excess space */
+                /* padding: 0.5in; */
             }
             .company-header {
                 text-align: center;
-                /* font-weight: bold; */ /* <-- Removed to un-bold the address */
                 margin-bottom: 10px;
             }
             .contract-title {
@@ -73,12 +73,12 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 text-decoration: underline;
             }
             .employee-info p {
-                margin: 2px 0;
+                margin: 1px 0; /* REDUCED SPACING */
             }
             .section-heading {
                 font-weight: bold;
                 text-decoration: underline;
-                margin-top: 1.2em;
+                margin-top: 1em;   /* REDUCED SPACING */
                 margin-bottom: 0.5em;
             }
             .justified {
@@ -88,13 +88,13 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 page-break-before: always;
             }
             .signature-block {
-                margin-top: 50px;
+                margin-top: 30px; /* REDUCED SPACING */
             }
             .acknowledgement-heading {
                  text-align: center;
                  font-weight: bold;
-                 margin-top: 30px;
-                 margin-bottom: 20px;
+                 margin-top: 25px; /* REDUCED SPACING */
+                 margin-bottom: 15px;
             }
             .annex-title {
                 text-align: center;
@@ -142,7 +142,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 <p>${formattedPhone}</p>
             </div>
             
-            <p style="margin-top: 20px;">${title === 'sir' ? 'Sir' : "Ma'am"};</p>
+            <p style="margin-top: 15px;">${title === 'sir' ? 'Sir' : "Ma'am"};</p>
 
             <p class="justified">We are pleased to inform you that you are being hired as probationary <strong><u>${position.toUpperCase()}</u></strong> effective <strong><u>${formattedStartDate}</u></strong> subject to the following terms and conditions, you will be assigned to one of our client the <strong><u>${client.toUpperCase()}</u></strong> and your Employee I.D. Number is <strong><u>${employeeId.toUpperCase()}</u></strong>,</p>
 
@@ -202,7 +202,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 <p class="section-heading">Trainings Sponsorships</p>
                 <p class="justified">You will refund to the company all expenses paid for your trainings if your resign or terminated for cause within one (1) year from the date of training. Such refund shall be immediately paid or deducted from whatever receivable or claims you may have.</p>
             </div>
-          <br>
+          
             <div class="section-block">
                 <p class="section-heading">Personal Expenses</p>
                 <p class="justified">The company shall not be responsible for any expenses you may incure in the execution of your duties unless the management before the incurrence of such expense, duly authorize the same.</p>
@@ -223,7 +223,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 <p class="justified">All company records, documents, and property in your possession must be returned or surrender upon request or resignation and/or termination of employment. Failure to do so may result in corresponding value being deducted from your salary, final pay or other receivables.</p>
             </div>
 
-            <p style="margin-top: 30px;">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
+            <p style="margin-top: 25px;">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
 
             <div class="signature-block">
                 <p><strong>FERNANDO B. PANGANIBAN</strong><br>HR & Admin Manager</p>
@@ -238,7 +238,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
             <p class="justified">Further, I authorize the Company to deduct from my salary the corresponding contribution to the Company's Group Accident Insurance.</p>
             <p class="justified">I assure the management of my loyalty, respect for my superiors, and commitment to perform my duties and responsibilities with diligence and dedication to the best of my ability.</p>
             <p class="justified">Finally, I acknowledge that dishonesty, falsification, or misrepresentation of information I have provided in my application or related documents shall constitute sufficient ground for termination of my employment.</p>
-            <p style="margin-top: 30px; font-weight: bold;">${name.toUpperCase()}</p>
+            <p style="margin-top: 25px; font-weight: bold;">${name.toUpperCase()}</p>
 
             <div class="page-break"></div>
 
