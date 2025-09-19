@@ -15,7 +15,8 @@ document.getElementById('previewBtn').addEventListener('click', function() {
     const companyKey = document.getElementById('company').value;
     const companyName = companyNameMap[companyKey];
     const companyAddress = companyAddressMap[companyKey];
-    const employmentType = document.getElementById('employment-type').value;
+    const employmentTypeSelect = document.getElementById('employment-type');
+    const employmentType = employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
     const name = document.getElementById('name').value;
     const address = document.getElementById('address').value;
     const email = document.getElementById('email').value;
@@ -49,17 +50,16 @@ document.getElementById('previewBtn').addEventListener('click', function() {
     const formattedPhone = `0${phone.substring(0,3)}.${phone.substring(3,6)}.${phone.substring(6,10)}`;
 
     // This style block is injected into the preview to match the PDF's formatting
-    // --- STYLES ADJUSTED FOR 3-PAGE LAYOUT ---
     const styles = `
         <style>
             body {
-                font-family: serif;
-                font-size: 10.5pt; /* REDUCED FONT SIZE */
-                line-height: 1.15;   /* REDUCED LINE HEIGHT */
+                font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+                font-size: 14pt;
+                line-height: 1.2;
                 color: black;
             }
             .contract-container {
-                /* padding: 0.5in; */
+               
             }
             .company-header {
                 text-align: center;
@@ -70,15 +70,13 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 font-weight: bold;
                 margin-top: 10px;
                 margin-bottom: 15px;
-                text-decoration: underline;
             }
             .employee-info p {
-                margin: 1px 0; /* REDUCED SPACING */
+                margin: 2px 0;
             }
             .section-heading {
                 font-weight: bold;
-                text-decoration: underline;
-                margin-top: 1em;   /* REDUCED SPACING */
+                margin-top: 1.2em;
                 margin-bottom: 0.5em;
             }
             .justified {
@@ -88,37 +86,44 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 page-break-before: always;
             }
             .signature-block {
-                margin-top: 30px; /* REDUCED SPACING */
+                margin-top: 50px;
             }
             .acknowledgement-heading {
                  text-align: center;
                  font-weight: bold;
-                 margin-top: 25px; /* REDUCED SPACING */
-                 margin-bottom: 15px;
+                 margin-top: 30px;
+                 margin-bottom: 20px;
             }
             .annex-title {
                 text-align: center;
                 font-weight: bold;
                 margin-top: 20px;
+                font-size: 20pt;
             }
+
+            .annex-header {
+                text-align: center;
+                font-weight: bold;
+                margin-top: 20px;
+                font-size: 18pt;
+            }
+
             .annex-subtitle {
                 text-align: center;
-                font-style: italic;
                 margin-bottom: 20px;
             }
             .kpi-heading {
                 font-weight: bold;
                 margin-top: 15px;
+                font-size: 14pt;
             }
             
-            /* --- FIX FOR PAGE BREAKS --- */
             .section-block {
                 page-break-inside: avoid;
             }
             li {
                  page-break-inside: avoid;
             }
-            /* --- END FIX --- */
         </style>
     `;
 
@@ -132,7 +137,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
             </div>
 
             <div class="contract-title">
-                <p>${employmentType.toUpperCase()} EMPLOYMENT CONTRACT</p>
+                <p>${employmentType} EMPLOYMENT CONTRACT</p>
             </div>
 
             <div class="employee-info">
@@ -142,9 +147,11 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 <p>${formattedPhone}</p>
             </div>
             
-            <p style="margin-top: 15px;">${title === 'sir' ? 'Sir' : "Ma'am"};</p>
+            <p style="margin-top: 20px;">${
+              title === "sir" ? "Sir" : "Ma'am"
+            };</p>
 
-            <p class="justified">We are pleased to inform you that you are being hired as probationary <strong><u>${position.toUpperCase()}</u></strong> effective <strong><u>${formattedStartDate}</u></strong> subject to the following terms and conditions, you will be assigned to one of our client the <strong><u>${client.toUpperCase()}</u></strong> and your Employee I.D. Number is <strong><u>${employeeId.toUpperCase()}</u></strong>,</p>
+            <p class="justified">We are pleased to inform you that you are being hired as ${employmentType} <strong>${position.toUpperCase()}</strong> effective <strong>${formattedStartDate}</strong> subject to the following terms and conditions, you will be assigned to one of our client the <strong>${client.toUpperCase()}</strong> and your Employee I.D. Number is <strong>${employeeId.toUpperCase()}</strong>,</p>
 
             <div class="section-block">
                 <p class="section-heading">Probationary Period</p>
@@ -153,7 +160,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
 
             <div class="section-block">
                 <p class="section-heading">Compensation and Benefits</p>
-                <p class="justified">Your salary shall be <strong>${salary}</strong> per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also received all standard legal benefits as mandated by Philippine labor laws and other social legislation.</p>
+                <p class="justified">Your salary shall be <strong>₱ ${salary}</strong> per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also received all standard legal benefits as mandated by Philippine labor laws and other social legislation.</p>
             </div>
 
             <div class="section-block">
@@ -202,7 +209,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 <p class="section-heading">Trainings Sponsorships</p>
                 <p class="justified">You will refund to the company all expenses paid for your trainings if your resign or terminated for cause within one (1) year from the date of training. Such refund shall be immediately paid or deducted from whatever receivable or claims you may have.</p>
             </div>
-          
+          <br>
             <div class="section-block">
                 <p class="section-heading">Personal Expenses</p>
                 <p class="justified">The company shall not be responsible for any expenses you may incure in the execution of your duties unless the management before the incurrence of such expense, duly authorize the same.</p>
@@ -223,7 +230,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 <p class="justified">All company records, documents, and property in your possession must be returned or surrender upon request or resignation and/or termination of employment. Failure to do so may result in corresponding value being deducted from your salary, final pay or other receivables.</p>
             </div>
 
-            <p style="margin-top: 25px;">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
+            <p style="margin-top: 30px;">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
 
             <div class="signature-block">
                 <p><strong>FERNANDO B. PANGANIBAN</strong><br>HR & Admin Manager</p>
@@ -238,12 +245,12 @@ document.getElementById('previewBtn').addEventListener('click', function() {
             <p class="justified">Further, I authorize the Company to deduct from my salary the corresponding contribution to the Company's Group Accident Insurance.</p>
             <p class="justified">I assure the management of my loyalty, respect for my superiors, and commitment to perform my duties and responsibilities with diligence and dedication to the best of my ability.</p>
             <p class="justified">Finally, I acknowledge that dishonesty, falsification, or misrepresentation of information I have provided in my application or related documents shall constitute sufficient ground for termination of my employment.</p>
-            <p style="margin-top: 25px; font-weight: bold;">${name.toUpperCase()}</p>
+            <p style="margin-top: 30px; font-weight: bold; text-align: right;">${name.toUpperCase()}</p>
 
-            <div class="page-break"></div>
+            <div style="height: 400px;"></div>
 
-            <div class="annex-title"><p>ANNEX "A"</p></div>
-            <div class="annex-title"><p>KEY PERFORMANCE FACTORS AND EXPECTATION PARAMETERS</p></div>
+            <div class="annex-title" style="text-align: right;"><p>ANNEX "A"</p></div>
+            <div class="annex-header"><p>KEY PERFORMANCE FACTORS AND EXPECTATION PARAMETERS</p></div>
             <div class="annex-subtitle"><p>(Upang magsilbing gabay sa pagtupad ng tungkulin)</p></div>
             
             <div class="section-block">
@@ -317,21 +324,85 @@ document.getElementById('previewBtn').addEventListener('click', function() {
     modal.show();
 });
 
-document.getElementById('downloadPdfBtn').addEventListener('click', function() {
-    const element = document.getElementById('contractPreviewBody');
-    const name = document.getElementById('name').value;
-    const fileName = `${name.replace(/\s/g, '_')}_Employment_Contract.pdf`;
-    
-    const opt = {
-        margin:       0.5,
-        filename:     fileName,
-        image:        { type: 'pdf', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'in', format:'legal', orientation: 'portrait' }
-    };
+document
+  .getElementById("downloadPdfBtn")
+  .addEventListener("click", async function () {
+    const element = document.getElementById("contractPreviewBody");
+    const name = document.getElementById("name").value;
+    const fileName = `${name.replace(/\s/g, "_")}_Employment_Contract.pdf`;
 
-    html2pdf().set(opt).from(element).save();
-});
+    const loader = document.getElementById("downloadLoader");
+    loader.classList.remove("d-none");
+    this.disabled = true;
+
+    // Use html2canvas to render the element as an image
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+    const imgProps = {
+      width: canvas.width,
+      height: canvas.height,
+    };
+    const imgData = canvas.toDataURL("image/png");
+
+    // Legal size: 8.5 x 14 inches
+    const margin = 0.5; // inches
+    const pdfPageWidth = 8.5;
+    const pdfPageHeight = 14;
+    const pdfContentWidth = pdfPageWidth - margin * 2;
+    const pdfContentHeight = pdfPageHeight - margin * 2;
+
+    const pdf = new window.jspdf.jsPDF({
+      orientation: "portrait",
+      unit: "in",
+      format: [pdfPageWidth, pdfPageHeight],
+    });
+
+    // Calculate scale between canvas pixels and PDF inches
+    const pxPerInch = 96; // html2canvas default
+    const scaleX = pdfContentWidth / (imgProps.width / pxPerInch);
+    const scaleY = pdfContentHeight / (imgProps.height / pxPerInch);
+
+    // Height of one PDF page in canvas pixels
+    const pageHeightPx = (pdfContentHeight * pxPerInch) / scaleX;
+
+    let pageCount = Math.ceil(imgProps.height / pageHeightPx);
+
+    for (let page = 0; page < pageCount; page++) {
+      if (page > 0) pdf.addPage();
+      // Crop the canvas for this page
+      const pageCanvas = document.createElement("canvas");
+      pageCanvas.width = imgProps.width;
+      pageCanvas.height = Math.min(
+        pageHeightPx,
+        imgProps.height - page * pageHeightPx
+      );
+      const ctx = pageCanvas.getContext("2d");
+      ctx.drawImage(
+        canvas,
+        0,
+        page * pageHeightPx,
+        imgProps.width,
+        pageCanvas.height,
+        0,
+        0,
+        imgProps.width,
+        pageCanvas.height
+      );
+      const pageImgData = pageCanvas.toDataURL("image/png");
+      pdf.addImage(
+        pageImgData,
+        "PNG",
+        margin,
+        margin,
+        pdfContentWidth,
+        (pageCanvas.height / pxPerInch) * scaleX
+      );
+    }
+
+    pdf.save(fileName);
+
+    loader.classList.add("d-none");
+    this.disabled = false;
+  });
 
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
