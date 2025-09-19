@@ -1,65 +1,72 @@
-document.getElementById('previewBtn').addEventListener('click', function() {
-    // Collect form data
-    const companyNameMap = {
-        'trade-marketing': 'TRADE MARKETING SOLUTIONS INC.',
-        'regcris': 'REGCRIS MARKETING NETWORK',
-        'prestige': 'PRESTIGE PROMOTIONS'
-    };
+document.getElementById("previewBtn").addEventListener("click", function () {
+  // Collect form data
+  const companyNameMap = {
+    "trade-marketing": "TRADE MARKETING SOLUTIONS INC.",
+    regcris: "REGCRIS MARKETING NETWORK",
+    prestige: "PRESTIGE PROMOTIONS",
+  };
 
-    const companyAddressMap = {
-        'trade-marketing': 'Room 306 3F CLMC Building, 259 EDSA, Barangay Wack-Wack Greenshills East, Mandaluyong City',
-        'regcris': '2768 Faraday, Makati City, 1234 Metro Manila',
-        'prestige': '3F Lupin Building, 2768 Faraday Street, Barangay San Isdro, Makati City'
-    };
+  const companyAddressMap = {
+    "trade-marketing":
+      "Room 306 3F CLMC Building, 259 EDSA, Barangay Wack-Wack Greenshills East, Mandaluyong City",
+    regcris: "2768 Faraday, Makati City, 1234 Metro Manila",
+    prestige:
+      "3F Lupin Building, 2768 Faraday Street, Barangay San Isdro, Makati City",
+  };
 
-    const companyKey = document.getElementById('company').value;
-    const companyName = companyNameMap[companyKey];
-    const companyAddress = companyAddressMap[companyKey];
-    const employmentTypeSelect = document.getElementById('employment-type');
-    const employmentType = employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
-    const name = document.getElementById('name').value;
-    const address = document.getElementById('address').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const title = document.getElementById('title').value; // sir or maam
-    const position = document.getElementById('position').value;
-    const startDate = new Date(document.getElementById('start-date').value);
-    const client = document.getElementById('client').value;
-    const workLocation = document.getElementById('work-location').value;
-    const employeeId = document.getElementById('employee-id').value;
-    const salary = parseFloat(document.getElementById('salary').value).toFixed(2);
+  const companyKey = document.getElementById("company").value;
+  const companyName = companyNameMap[companyKey];
+  const companyAddress = companyAddressMap[companyKey];
+  const employmentTypeSelect = document.getElementById("employment-type");
+  const employmentType =
+    employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
+  const name = document.getElementById("name").value;
+  const address = document.getElementById("address").value;
+  const email = document.getElementById("email").value;
+  const phone = document.getElementById("phone").value;
+  const title = document.getElementById("title").value; // sir or maam
+  const position = document.getElementById("position").value;
+  const startDate = new Date(document.getElementById("start-date").value);
+  const client = document.getElementById("client").value;
+  const workLocation = document.getElementById("work-location").value;
+  const employeeId = document.getElementById("employee-id").value;
+  const salary = parseFloat(document.getElementById("salary").value).toFixed(2);
 
-    // Format start date (e.g., September 18, 2025)
-    const formattedStartDate = startDate.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit'
-    });
-    
-    // Calculate end date (6 months - 1 day)
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 6);
-    endDate.setDate(endDate.getDate() - 1);
-    const formattedEndDate = endDate.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit'
-    });
+  // Format start date (e.g., September 18, 2025)
+  const formattedStartDate = startDate.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
 
-    // Format phone number to match PDF sample (e.g., 0999.502.6333)
-    const formattedPhone = `0${phone.substring(0,3)}.${phone.substring(3,6)}.${phone.substring(6,10)}`;
+  // Calculate end date (6 months - 1 day)
+  const endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + 6);
+  endDate.setDate(endDate.getDate() - 1);
+  const formattedEndDate = endDate.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
 
-    // This style block is injected into the preview to match the PDF's formatting
-    const styles = `
+  // Format phone number to match PDF sample (e.g., 0999.502.6333)
+  const formattedPhone = `0${phone.substring(0, 3)}.${phone.substring(
+    3,
+    6
+  )}.${phone.substring(6, 10)}`;
+
+  // This style block is injected into the preview to match the PDF's formatting
+  const styles = `
         <style>
             body {
                 font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-                font-size: 14pt;
-                line-height: 1.2;
+                font-size: 11pt;
+                line-height: 1.5; /* Increased line height for readability */
                 color: black;
             }
             .contract-container {
-               
+                width: 100%;
+                height: auto;
             }
             .company-header {
                 text-align: center;
@@ -78,9 +85,12 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 font-weight: bold;
                 margin-top: 1.2em;
                 margin-bottom: 0.5em;
+                page-break-before: always; /* Forces page break before each section */
             }
             .justified {
                 text-align: justify;
+                word-wrap: break-word;  /* Ensures long words break appropriately */
+                overflow-wrap: break-word;
             }
             .page-break {
                 page-break-before: always;
@@ -89,10 +99,10 @@ document.getElementById('previewBtn').addEventListener('click', function() {
                 margin-top: 50px;
             }
             .acknowledgement-heading {
-                 text-align: center;
-                 font-weight: bold;
-                 margin-top: 30px;
-                 margin-bottom: 20px;
+                text-align: center;
+                font-weight: bold;
+                margin-top: 30px;
+                margin-bottom: 20px;
             }
             .annex-title {
                 text-align: center;
@@ -120,15 +130,16 @@ document.getElementById('previewBtn').addEventListener('click', function() {
             
             .section-block {
                 page-break-inside: avoid;
+                margin-bottom: 20px; /* Adds spacing between sections */
             }
             li {
-                 page-break-inside: avoid;
+                page-break-inside: avoid;
             }
         </style>
     `;
 
-    // Generate contract preview HTML, structured to match the PDF sample
-    const previewHtml = `
+  // Generate contract preview HTML, structured to match the PDF sample
+  const previewHtml = `
         ${styles}
         <div class="contract-container">
             <div class="company-header">
@@ -155,12 +166,12 @@ document.getElementById('previewBtn').addEventListener('click', function() {
 
             <div class="section-block">
                 <p class="section-heading">Probationary Period</p>
-                <p class="justified">Your probationary employment shall be for a period of not more than six (6) months from <strong>${formattedStartDate}</strong> to <strong>${formattedEndDate}</strong>. Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factos and Expectation outlined in Annex "A" of this contract.</p>
+                <p class="justified">Your probationary employment shall be for a period of not more than six (6) months from <strong>${formattedStartDate}</strong> to <strong>${formattedEndDate}</strong>. Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.</p>
             </div>
 
             <div class="section-block">
                 <p class="section-heading">Compensation and Benefits</p>
-                <p class="justified">Your salary shall be <strong>₱ ${salary}</strong> per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also received all standard legal benefits as mandated by Philippine labor laws and other social legislation.</p>
+                <p class="justified">Your salary shall be <strong>₱${salary}</strong> per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.</p>
             </div>
 
             <div class="section-block">
@@ -232,7 +243,7 @@ document.getElementById('previewBtn').addEventListener('click', function() {
 
             <p style="margin-top: 30px;">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
 
-            <div class="signature-block">
+            <div class="signature-block" style="text-align: right;">
                 <p><strong>FERNANDO B. PANGANIBAN</strong><br>HR & Admin Manager</p>
             </div>
 
@@ -247,9 +258,9 @@ document.getElementById('previewBtn').addEventListener('click', function() {
             <p class="justified">Finally, I acknowledge that dishonesty, falsification, or misrepresentation of information I have provided in my application or related documents shall constitute sufficient ground for termination of my employment.</p>
             <p style="margin-top: 30px; font-weight: bold; text-align: right;">${name.toUpperCase()}</p>
 
-            <div style="height: 400px;"></div>
+            <div class="page-break"></div>
 
-            <div class="annex-title" style="text-align: right;"><p>ANNEX "A"</p></div>
+            <div class="annex-title" style="text-align: right; margin-top: 14em;"><p>ANNEX "A"</p></div>
             <div class="annex-header"><p>KEY PERFORMANCE FACTORS AND EXPECTATION PARAMETERS</p></div>
             <div class="annex-subtitle"><p>(Upang magsilbing gabay sa pagtupad ng tungkulin)</p></div>
             
@@ -317,11 +328,13 @@ document.getElementById('previewBtn').addEventListener('click', function() {
         </div>
     `;
 
-    document.getElementById('contractPreviewBody').innerHTML = previewHtml;
+  document.getElementById("contractPreviewBody").innerHTML = previewHtml;
 
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('contractPreviewModal'));
-    modal.show();
+  // Show modal
+  const modal = new bootstrap.Modal(
+    document.getElementById("contractPreviewModal")
+  );
+  modal.show();
 });
 
 document
@@ -356,19 +369,17 @@ document
       format: [pdfPageWidth, pdfPageHeight],
     });
 
-    // Calculate scale between canvas pixels and PDF inches
+    // Adjust scaling and page breaks in PDF
     const pxPerInch = 96; // html2canvas default
     const scaleX = pdfContentWidth / (imgProps.width / pxPerInch);
     const scaleY = pdfContentHeight / (imgProps.height / pxPerInch);
 
-    // Height of one PDF page in canvas pixels
     const pageHeightPx = (pdfContentHeight * pxPerInch) / scaleX;
 
     let pageCount = Math.ceil(imgProps.height / pageHeightPx);
 
     for (let page = 0; page < pageCount; page++) {
       if (page > 0) pdf.addPage();
-      // Crop the canvas for this page
       const pageCanvas = document.createElement("canvas");
       pageCanvas.width = imgProps.width;
       pageCanvas.height = Math.min(
@@ -404,7 +415,7 @@ document
     this.disabled = false;
   });
 
-document.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    document.getElementById('previewBtn').click();
+document.querySelector("form").addEventListener("submit", function (e) {
+  e.preventDefault();
+  document.getElementById("previewBtn").click();
 });
