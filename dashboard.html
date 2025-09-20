@@ -76,8 +76,8 @@
                                 <label for="employment-type" class="form-label">Employment Type</label>
                                 <select class="form-select" id="employment-type" required>
                                     <option value="">Select Type</option>
-                                    <option value="probationary">Probationary</option>
-                                    <option value="contractual">Contractual</option>
+                                    <option value="PROBATIONARY">Probationary</option>
+                                    <option value="CONTRACTUAL">Contractual</option>
                                 </select>
                             </div>
                         </div>
@@ -85,12 +85,12 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="name" required>
+                                <input type="text" class="form-control" id="name" style="text-transform: capitalize;" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="address" class="form-label">Address</label>
-                                <input type="text" class="form-control" id="address" required>
+                                <input type="text" class="form-control" id="address" style="text-transform: capitalize;" required>
                             </div>
                         </div>
 
@@ -104,7 +104,7 @@
                                 <label for="phone" class="form-label">Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text">+63</span>
-                                    <input type="tel" class="form-control" id="phone" pattern="[0-9]{10}" maxlength="10" placeholder="9123456789" required>
+                                    <input type="tel" class="form-control" id="phone" pattern="[0-9]{10}" maxlength="10" placeholder="9123456789" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                                 </div>
                                 <small class="text-muted">Enter 10-digit mobile number (e.g., 9123456789)</small>
                             </div>
@@ -112,12 +112,21 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="title" class="form-label">Title</label>
-                                <select class="form-select" id="title" required>
-                                    <option value="">Select Title</option>
-                                    <option value="sir">Sir</option>
-                                    <option value="maam">Ma'am</option>
-                                </select>
+                                <label class="form-label">Title</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="title" id="title-sir" value="sir" required>
+                                        <label class="form-check-label" for="title-sir">
+                                            Sir
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="title" id="title-maam" value="maam" required>
+                                        <label class="form-check-label" for="title-maam">
+                                            Ma'am
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -167,7 +176,7 @@
                         </div>
 
                         <div class="mt-4 text-end">
-                            <button type="reset" class="btn btn-light text-danger me-2">
+                            <button type="button" class="btn btn-light text-danger me-2" id="resetConfirmBtn">
                                 <span class="d-inline d-md-none"><i class="bi bi-arrow-counterclockwise"></i></span>
                                 <span class="d-none d-md-inline"><i class="bi bi-arrow-counterclockwise"></i> Reset Form</span>
                             </button>
@@ -184,10 +193,28 @@
             </div>
         </div>
     </main>
+    <!-- Add this Bootstrap modal just before the closing </body> tag -->
+    <div class="modal fade" id="resetConfirmModal" tabindex="-1" aria-labelledby="resetConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetConfirmLabel">Confirm Reset</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to reset the form? All entered data will be lost.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmResetBtn">Yes, Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Contract Preview Modal -->
     <div class="modal fade" id="contractPreviewModal" tabindex="-1" aria-labelledby="contractPreviewLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="contractPreviewLabel">Contract Preview</h5>
@@ -272,6 +299,23 @@
                         sidebarOverlay.classList.remove('show');
                         document.body.classList.remove('sidebar-open');
                     }
+                });
+            }
+
+            // Reset confirmation modal logic
+            const resetConfirmBtn = document.getElementById('resetConfirmBtn');
+            const resetConfirmModal = new bootstrap.Modal(document.getElementById('resetConfirmModal'));
+            const confirmResetBtn = document.getElementById('confirmResetBtn');
+
+            if (resetConfirmBtn && confirmResetBtn && contractForm) {
+                resetConfirmBtn.addEventListener('click', function(e) {
+                    resetConfirmModal.show();
+                });
+
+                confirmResetBtn.addEventListener('click', function() {
+                    contractForm.reset();
+                    document.getElementById('previewBtn').disabled = true;
+                    resetConfirmModal.hide();
                 });
             }
 
