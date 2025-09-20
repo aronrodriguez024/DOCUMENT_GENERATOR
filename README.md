@@ -24,6 +24,7 @@ This tool is built with HTML, Bootstrap 5, and JavaScript to provide a fast, cli
 
 The project structure is simple and organized, with all core logic contained in the root directory.
 
+```
 DOCUMENT_GENERATOR/
 │
 ├── dashboard.html              # The main HTML file for the dashboard
@@ -33,6 +34,7 @@ DOCUMENT_GENERATOR/
 └── assets/
 └── images/
 └── favicon_regcris.png   # Application favicon
+```
 
 ## 🚀 Getting Started
 
