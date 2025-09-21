@@ -3,7 +3,7 @@ function collectFormData() {
   const companyNameMap = {
     "trade-marketing": "TRADE MARKETING SOLUTIONS INC.",
     regcris: "REGCRIS MARKETING NETWORK",
-    prestige: "PRESTIGE PROMOTIONS",
+    prestige: "PRESTIGE PROMOTIONS INC.",
   };
 
   const companyAddressMap = {
@@ -18,8 +18,7 @@ function collectFormData() {
   const companyName = companyNameMap[companyKey];
   const companyAddress = companyAddressMap[companyKey];
   const employmentTypeSelect = document.getElementById("employment-type");
-  const employmentType =
-    employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
+  const employmentType = employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
   const name = document.getElementById("name").value;
   const address = document.getElementById("address").value;
   const email = document.getElementById("email").value;
@@ -28,7 +27,6 @@ function collectFormData() {
   const position = document.getElementById("position").value;
   const startDate = new Date(document.getElementById("start-date").value);
   const client = document.getElementById("client").value;
-  const workLocation = document.getElementById("work-location").value;
   const employeeId = document.getElementById("employee-id").value;
   const salary = parseFloat(document.getElementById("salary").value).toFixed(2);
 
@@ -70,7 +68,6 @@ function collectFormData() {
     formattedStartDate,
     formattedEndDate,
     client,
-    workLocation,
     employeeId,
     salary,
   };
@@ -85,11 +82,11 @@ function generateContractData(formData) {
     },
     {
       title: "Compensation and Benefits",
-      content: `Your salary shall be PHP ${formData.salary} per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
+      content: `Your salary shall be P${formData.salary} per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
     },
     {
       title: "Work Assignment and Location",
-      content: `Your initial work assignment will be at ${formData.workLocation}. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.`,
+      content: `Your initial work assignment will be at ______________________________. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.`,
     },
     {
       title: "Duties and Responsibilities",
@@ -528,6 +525,33 @@ async function generateContractPDF(formData, contractData) {
       }
     }
 
+    function toCapitalizedWords(str) {
+      return str.replace(/\b\w/g, char => char.toUpperCase()).replace(/\B\w/g, char => char.toLowerCase());
+    }
+
+    function renderStyledLine(pdf, segments, x, y, options = {}) {
+      const fontSize = options.fontSize || 9.5;
+      const maxWidth = options.maxWidth || pageWidth - margin * 2;
+      let currentX = x;
+
+      pdf.setFontSize(fontSize);
+
+      segments.forEach((segment) => {
+        pdf.setFont(fontFamily, segment.fontStyle || "normal");
+        const textWidth = pdf.getTextWidth(segment.text);
+
+        // If exceeds maxWidth, move to next line
+        if (currentX + textWidth > x + maxWidth) {
+          y += lineHeight;
+          currentX = x;
+        }
+        pdf.text(segment.text, currentX, y);
+        currentX += textWidth;
+      });
+
+      return y + lineHeight;
+    }
+
     function addWrappedText(text, x, y, maxWidth, options = {}) {
       const fontSize = options.fontSize || 9.5;
       const fontStyle = options.fontStyle || "normal";
@@ -586,12 +610,17 @@ async function generateContractPDF(formData, contractData) {
     );
     yPos += lineHeight * 0.8;
 
-    addText(`${formData.employmentType} EMPLOYMENT CONTRACT`, 0, yPos, {
-      fontSize: 11,
-      fontStyle: "bold",
-      align: "center",
-    });
-    yPos += lineHeight * 1.3;
+    addText(
+      `${formData.employmentType.toUpperCase()} EMPLOYMENT CONTRACT`,
+      0,
+      yPos,
+      {
+        fontSize: 11,
+        fontStyle: "bold",
+        align: "center",
+      }
+    );
+    yPos += lineHeight * 2.6;
 
     // Employee info
     addText(formData.name.toUpperCase(), margin, yPos, {
@@ -601,7 +630,7 @@ async function generateContractPDF(formData, contractData) {
     yPos += lineHeight * 0.9;
 
     yPos = addWrappedText(
-      formData.address,
+      toCapitalizedWords(formData.address),
       margin,
       yPos,
       pageWidth - margin * 2,
@@ -613,24 +642,28 @@ async function generateContractPDF(formData, contractData) {
     yPos += lineHeight * 0.9;
 
     addText(formData.formattedPhone, margin, yPos, { fontSize: 9.5 });
-    yPos += lineHeight * 1.3;
+    yPos += lineHeight * 2.3;
 
     // Greeting
     addText(`${formData.title === "sir" ? "Sir" : "Ma'am"};`, margin, yPos, {
       fontSize: 9.5,
     });
-    yPos += lineHeight * 1.3;
+    yPos += lineHeight * 1.8;
 
     // Opening paragraph
-    const openingText = `We are pleased to inform you that you are being hired as ${
-      formData.employmentType
-    } ${formData.position.toUpperCase()} effective ${
-      formData.formattedStartDate
-    } subject to the following terms and conditions, you will be assigned to one of our client the ${formData.client.toUpperCase()} and your Employee I.D. Number is ${formData.employeeId.toUpperCase()},`;
+    const openingSegments = [
+      { text: "We are pleased to inform you that you are being hired as  ", fontStyle: "normal" },
+      { text: formData.employmentType + " ", fontStyle: "normal" },
+      { text: formData.position.toUpperCase() + " ", fontStyle: "bold" },
+      { text: "effective ", fontStyle: "normal" },
+      { text: formData.formattedStartDate + " ", fontStyle: "bold" },
+      { text: "subject to the following terms and conditions, you will be assigned to one of our client the  ", fontStyle: "normal" }, // <-- space at end
+      { text: formData.client.toUpperCase() + "  ", fontStyle: "bold" },
+      { text: "and your Employee I.D. Number is  ", fontStyle: "normal" },
+      { text: formData.employeeId.toUpperCase() + ",", fontStyle: "bold" }
+    ];
 
-    yPos = addWrappedText(openingText, margin, yPos, pageWidth - margin * 2, {
-      fontSize: 9.5,
-    });
+    yPos = renderStyledLine(pdf, openingSegments, margin, yPos, { fontSize: 9.5, maxWidth: pageWidth - margin * 2 });
     yPos += lineHeight * 0.9;
 
     // Add sections
@@ -728,10 +761,16 @@ async function generateContractPDF(formData, contractData) {
 
     // Employee signature
     yPos += lineHeight * 0.9;
-    addText(formData.name.toUpperCase(), margin + 400, yPos, {
-      fontSize: 9.5,
-      fontStyle: "bold",
+    const signatureMaxWidth = 200; // Adjust as needed
+    const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
+    signatureLines.forEach((line, i) => {
+      addText(line, pageWidth - margin - signatureMaxWidth, yPos + i * lineHeight, {
+        fontSize: 9.5,
+        fontStyle: "bold",
+        align: "right",
+      });
     });
+    yPos += lineHeight * signatureLines.length;
 
     // Force new page for Annex A
     pdf.addPage();
@@ -755,7 +794,7 @@ async function generateContractPDF(formData, contractData) {
       fontSize: 12,
       align: "center",
     });
-    yPos += lineHeight * 1.3;
+    yPos += lineHeight * 4.3;
 
     // KPI sections
     contractData.kpiSections.forEach((section, sectionIndex) => {
@@ -800,71 +839,82 @@ async function generateContractPDF(formData, contractData) {
 }
 
 // Preview button event listener (modified)
-document.getElementById("previewBtn").addEventListener("click", async function () {
-  try {
+document
+  .getElementById("previewBtn")
+  .addEventListener("click", async function () {
+    try {
+      const loader = document.getElementById("downloadLoader");
+      loader.classList.remove("d-none");
+      this.disabled = true;
+
+      const formData = collectFormData();
+      const contractData = generateContractData(formData);
+
+      // Generate the PDF and store it for later download
+      const pdf = await generateContractPDF(formData, contractData);
+
+      // Convert the PDF to a data URL for preview
+      const pdfData = pdf.output("datauristring");
+
+      // Create an iframe to display the PDF
+      const previewFrame = `<iframe src="${pdfData}" width="100%" height="100%" style="border: none; min-height: 70vh; max-height: 80vh;" class="responsive-pdf-iframe"></iframe>`;
+
+      // Update the preview modal with the iframe
+      document.getElementById("contractPreviewBody").innerHTML = previewFrame;
+
+      // Store the PDF in a global variable for download button
+      window.generatedPdf = pdf;
+
+      // Show modal
+      const modal = new bootstrap.Modal(
+        document.getElementById("contractPreviewModal")
+      );
+      modal.show();
+    } catch (error) {
+      console.error("Preview generation error:", error);
+      alert(
+        "An error occurred while generating the preview. Please try again."
+      );
+    } finally {
+      const loader = document.getElementById("downloadLoader");
+      loader.classList.add("d-none");
+      this.disabled = false;
+    }
+  });
+
+// Download PDF button event listener (modified)
+document
+  .getElementById("downloadPdfBtn")
+  .addEventListener("click", function () {
     const loader = document.getElementById("downloadLoader");
     loader.classList.remove("d-none");
     this.disabled = true;
-    
-    const formData = collectFormData();
-    const contractData = generateContractData(formData);
-    
-    // Generate the PDF and store it for later download
-    const pdf = await generateContractPDF(formData, contractData);
-    
-    // Convert the PDF to a data URL for preview
-    const pdfData = pdf.output('datauristring');
-    
-    // Create an iframe to display the PDF
-    const previewFrame = `<iframe src="${pdfData}" width="100%" height="100%" style="border: none; min-height: 70vh; max-height: 80vh;" class="responsive-pdf-iframe"></iframe>`;
-    
-    // Update the preview modal with the iframe
-    document.getElementById("contractPreviewBody").innerHTML = previewFrame;
-    
-    // Store the PDF in a global variable for download button
-    window.generatedPdf = pdf;
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById("contractPreviewModal"));
-    modal.show();
-  } catch (error) {
-    console.error("Preview generation error:", error);
-    alert("An error occurred while generating the preview. Please try again.");
-  } finally {
-    const loader = document.getElementById("downloadLoader");
-    loader.classList.add("d-none");
-    this.disabled = false;
-  }
-});
 
-// Download PDF button event listener (modified)
-document.getElementById("downloadPdfBtn").addEventListener("click", function () {
-  const loader = document.getElementById("downloadLoader");
-  loader.classList.remove("d-none");
-  this.disabled = true;
-  
-  try {
-    const formData = collectFormData();
-    const fileName = `${formData.name.replace(/\s/g, "_")}_Employment_Contract.pdf`;
-    
-    // If we have already generated the PDF during preview, use that
-    if (window.generatedPdf) {
-      window.generatedPdf.save(fileName);
-    } else {
-      // Otherwise generate a new PDF (fallback)
-      const contractData = generateContractData(formData);
-      generateContractPDF(formData, contractData).then(pdf => {
-        pdf.save(fileName);
-      });
+    try {
+      const formData = collectFormData();
+      const fileName = `${formData.name.replace(
+        /\s/g,
+        "_"
+      )}_Employment_Contract.pdf`;
+
+      // If we have already generated the PDF during preview, use that
+      if (window.generatedPdf) {
+        window.generatedPdf.save(fileName);
+      } else {
+        // Otherwise generate a new PDF (fallback)
+        const contractData = generateContractData(formData);
+        generateContractPDF(formData, contractData).then((pdf) => {
+          pdf.save(fileName);
+        });
+      }
+    } catch (error) {
+      console.error("PDF download error:", error);
+      alert("An error occurred while downloading the PDF. Please try again.");
+    } finally {
+      loader.classList.add("d-none");
+      this.disabled = false;
     }
-  } catch (error) {
-    console.error("PDF download error:", error);
-    alert("An error occurred while downloading the PDF. Please try again.");
-  } finally {
-    loader.classList.add("d-none");
-    this.disabled = false;
-  }
-});
+  });
 
 document.querySelector("form").addEventListener("submit", function (e) {
   e.preventDefault();
