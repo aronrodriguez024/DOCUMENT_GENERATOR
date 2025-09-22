@@ -78,20 +78,22 @@ function generateContractData(formData) {
   const sections = [
     {
       title: "Probationary Period",
-      content: `Your probationary employment shall be for a period of not more than six (6) months from ${formData.formattedStartDate} to ${formData.formattedEndDate}. Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
+      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}**. Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
+      useMarkdown: true,
     },
     {
       title: "Compensation and Benefits",
-      content: `Your salary shall be P${formData.salary} per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
+      content: `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
+      useMarkdown: true,
     },
     {
       title: "Work Assignment and Location",
-      content: `Your initial work assignment will be at ______________________________. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.`,
+      content: `Your initial work assignment will be at ________________________________. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.`,
+      useMarkdown: false,
     },
     {
       title: "Duties and Responsibilities",
-      content:
-        "Your primary task shall include, but are not limited to, the following:",
+      content: "Your primary task shall include, but are not limited to, the following:",
       list: [
         "Arrange, and replenish products on shelves, and off-shelf displays (OSDs) following company standards.",
         "Maintain clean, organized, and well-stocked product displays at all times.",
@@ -110,46 +112,47 @@ function generateContractData(formData) {
           "Bad Order (B.O.)",
         ],
       },
+      useMarkdown: false,
     },
     {
       title: "Reporting Line",
-      content:
-        "You shall report directly to the company's designated coordinators, supervisors or officers. All work instructions and guidance shall come from them. They will orient you on your work schedule, attendance monitoring, performance evaluation, compliance, and other job-related matters.",
+      content: "You shall report directly to the company's designated coordinators, supervisors or officers. All work instructions and guidance shall come from them. They will orient you on your work schedule, attendance monitoring, performance evaluation, compliance, and other job-related matters.",
+      useMarkdown: false,
     },
     {
       title: "Company Policies",
-      content:
-        "You are expected to strictly comply with all existing and future company rules and policies, including but not limited to those regarding discipline, work ethics, honesty, safety operating procedures, use of company property, and confidentiality.",
+      content: "You are expected to strictly comply with all existing and future company rules and policies, including but not limited to those regarding discipline, work ethics, honesty, safety operating procedures, use of company property, and confidentiality.",
+      useMarkdown: true,
     },
     {
       title: "Liability for Loss or Damages",
-      content:
-        "Any loss or damage to the company, client or store's goods, products, or equipment resulting from your negligence, misconduct, or fraud shall be your responsibility and will be charged to your account.",
+      content: "Any loss or damage to the company, client or store's goods, products, or equipment resulting from your negligence, misconduct, or fraud shall be your responsibility and will be charged to your account.",
+      useMarkdown: true,
     },
     {
       title: "Trainings Sponsorships",
-      content:
-        "You will refund to the company all expenses paid for your trainings if you resign or terminated for cause within one (1) year from the date of training. Such refund shall be immediately paid or deducted from whatever receivable or claims you may have.",
+      content: "You will refund to the company all expenses paid for your trainings if you resign or terminated for cause within one (1) year from the date of training. Such refund shall be immediately paid or deducted from whatever receivable or claims you may have.",
+      useMarkdown: true,
     },
     {
       title: "Personal Expenses",
-      content:
-        "The company shall not be responsible for any expenses you may incur in the execution of your duties unless the management before the incurrence of such expense, duly authorize the same.",
+      content: "The company shall not be responsible for any expenses you may incur in the execution of your duties unless the management before the incurrence of such expense, duly authorize the same.",
+      useMarkdown: true,
     },
     {
       title: "Leave of Absence and Resignation",
-      content:
-        "You are required to render and notify the management through formal notice at least 30 days before the intended date, failure to do so will cause nominal charges. The same advance notice also applies for a planned leave of absence by notifying your immediate superior at least 3 days before.",
+      content: "You are required to render and notify the management through formal notice at least 30 days before the intended date, failure to do so will cause nominal charges. The same advance notice also applies for a planned leave of absence by notifying your immediate superior at least 3 days before.",
+      useMarkdown: true,
     },
     {
       title: "Termination of Employment",
-      content:
-        "Your employment may be terminated at any time for cause, following due process, in accordance to the procedure set by the Labor Code of the Philippines.",
+      content: "Your employment may be terminated at any time for cause, following due process, in accordance to the procedure set by the Labor Code of the Philippines.",
+      useMarkdown: true,
     },
     {
       title: "Return of Company Property",
-      content:
-        "All company records, documents, and property in your possession must be returned or surrender upon request or resignation and/or termination of employment. Failure to do so may result in corresponding value being deducted from your salary, final pay or other receivables.",
+      content: "All company records, documents, and property in your possession must be returned or surrender upon request or resignation and/or termination of employment. Failure to do so may result in corresponding value being deducted from your salary, final pay or other receivables.",
+      useMarkdown: true,
     },
   ];
 
@@ -176,7 +179,7 @@ function generateContractData(formData) {
         "Nagsusubmit ng mga required na report sa takdang panahon (OSA, Inventory, price survey, SOS, etc).",
         "Nagbibigay ng tamang report (accurate) sa supervisor o coordinator.",
         "Sinisiguro na naipa-alam sa supervisor or coordinator ang mga out of stock na item sa tindahan.",
-        "Nagpadadala ng DTR sa takdang araw.",
+        "Nagpadala ng DTR sa takdang araw.",
       ],
     },
     {
@@ -428,9 +431,7 @@ function generatePreviewHTML(formData, contractData) {
         <p>${formData.formattedPhone}</p>
       </div>
       
-      <p style="margin-top: 32px;">${
-        formData.title === "sir" ? "Sir" : "Ma'am"
-      };</p>
+      <p style="margin-top: 32px;">Sir/Ma'am;</p>
 
       <p class="justified">We are pleased to inform you that you are being hired as ${
         formData.employmentType
@@ -593,6 +594,42 @@ async function generateContractPDF(formData, contractData) {
       }
     }
 
+    // Add this function inside generateContractPDF, before its usage:
+    function addJustifiedText(pdf, text, x, y, maxWidth, options = {}) {
+      const fontSize = options.fontSize || 9.5;
+      const fontStyle = options.fontStyle || "normal";
+      pdf.setFontSize(fontSize);
+      pdf.setFont(fontFamily, fontStyle);
+
+      const lines = pdf.splitTextToSize(text, maxWidth);
+      lines.forEach((line, i) => {
+        // Only justify if not the last line
+        if (i < lines.length - 1) {
+          const words = line.trim().split(/\s+/);
+          if (words.length === 1) {
+            pdf.text(line, x, y + i * lineHeight);
+            return;
+          }
+          const lineTextWidth = words.reduce((acc, word) => acc + pdf.getTextWidth(word), 0);
+          const spaceCount = words.length - 1;
+          const totalSpaceWidth = maxWidth - lineTextWidth;
+          const spaceWidth = totalSpaceWidth / spaceCount;
+
+          let currentX = x;
+          words.forEach((word, wi) => {
+            pdf.text(word, currentX, y + i * lineHeight);
+            if (wi < spaceCount) {
+              currentX += pdf.getTextWidth(word) + spaceWidth;
+            }
+          });
+        } else {
+          // Last line: left align
+          pdf.text(line, x, y + i * lineHeight);
+        }
+      });
+      return y + lines.length * lineHeight;
+    }
+
     // Company header
     addText(formData.companyName, 0, yPos, {
       fontSize: 12,
@@ -601,14 +638,16 @@ async function generateContractPDF(formData, contractData) {
     });
     yPos += lineHeight + 5;
 
-    yPos = addWrappedText(
+    addText(
       formData.companyAddress,
-      margin,
+      0,
       yPos,
-      pageWidth - margin * 2,
-      { fontSize: 8.5, align: "center" }
+      {
+        fontSize: 8.5,
+        align: "center",
+      }
     );
-    yPos += lineHeight * 0.8;
+    yPos += lineHeight * 1.8;
 
     addText(
       `${formData.employmentType.toUpperCase()} EMPLOYMENT CONTRACT`,
@@ -629,7 +668,8 @@ async function generateContractPDF(formData, contractData) {
     });
     yPos += lineHeight * 0.9;
 
-    yPos = addWrappedText(
+    yPos = addJustifiedText(
+      pdf,
       toCapitalizedWords(formData.address),
       margin,
       yPos,
@@ -645,25 +685,23 @@ async function generateContractPDF(formData, contractData) {
     yPos += lineHeight * 2.3;
 
     // Greeting
-    addText(`${formData.title === "sir" ? "Sir" : "Ma'am"};`, margin, yPos, {
+    addText("Sir/Ma'am;", margin, yPos, {
       fontSize: 9.5,
     });
     yPos += lineHeight * 1.8;
 
     // Opening paragraph
-    const openingSegments = [
-      { text: "We are pleased to inform you that you are being hired as  ", fontStyle: "normal" },
-      { text: formData.employmentType + " ", fontStyle: "normal" },
-      { text: formData.position.toUpperCase() + " ", fontStyle: "bold" },
-      { text: "effective ", fontStyle: "normal" },
-      { text: formData.formattedStartDate + " ", fontStyle: "bold" },
-      { text: "subject to the following terms and conditions, you will be assigned to one of our client the  ", fontStyle: "normal" }, // <-- space at end
-      { text: formData.client.toUpperCase() + "  ", fontStyle: "bold" },
-      { text: "and your Employee I.D. Number is  ", fontStyle: "normal" },
-      { text: formData.employeeId.toUpperCase() + ",", fontStyle: "bold" }
-    ];
+    const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}**,`;
 
-    yPos = renderStyledLine(pdf, openingSegments, margin, yPos, { fontSize: 9.5, maxWidth: pageWidth - margin * 2 });
+    // Use renderStyledText instead of addJustifiedText for markdown parsing
+    yPos = renderStyledText(
+      pdf,
+      openingText,
+      margin,
+      yPos,
+      pageWidth - margin * 2,
+      { fontSize: 9.5, fontFamily: fontFamily }
+    );
     yPos += lineHeight * 0.9;
 
     // Add sections
@@ -676,20 +714,34 @@ async function generateContractPDF(formData, contractData) {
       });
       yPos += lineHeight + 4;
 
-      yPos = addWrappedText(
-        section.content,
-        margin,
-        yPos,
-        pageWidth - margin * 2,
-        { fontSize: 9.5 }
-      );
+      // Check if section should use markdown rendering
+      if (section.useMarkdown) {
+        yPos = renderStyledText(
+          pdf,
+          section.content,
+          margin,
+          yPos,
+          pageWidth - margin * 2,
+          { fontSize: 9.5, fontFamily: fontFamily } // Add fontFamily to options
+        );
+      } else {
+        yPos = addJustifiedText(
+          pdf,
+          section.content,
+          margin,
+          yPos,
+          pageWidth - margin * 2,
+          { fontSize: 9.5 }
+        );
+      }
       yPos += lineHeight * 0.9;
 
       if (section.list) {
         section.list.forEach((item, index) => {
           checkPageBreak(28);
           let listText = `${index + 1}. ${item}`;
-          yPos = addWrappedText(
+          yPos = addJustifiedText(
+            pdf,
             listText,
             margin + 20,
             yPos,
@@ -701,7 +753,8 @@ async function generateContractPDF(formData, contractData) {
             section.subList[index].forEach((subItem, subIndex) => {
               checkPageBreak(23);
               const subLetter = String.fromCharCode(97 + subIndex);
-              yPos = addWrappedText(
+              yPos = addJustifiedText(
+                pdf,
                 `   ${subLetter}) ${subItem}`,
                 margin + 35,
                 yPos,
@@ -721,7 +774,8 @@ async function generateContractPDF(formData, contractData) {
 
     // Closing statement
     checkPageBreak(35);
-    yPos = addWrappedText(
+    yPos = addJustifiedText(
+      pdf,
       "We welcome you into our organization and trust that your association with us will be mutually beneficial!",
       margin,
       yPos,
@@ -753,15 +807,20 @@ async function generateContractPDF(formData, contractData) {
 
     contractData.acknowledgements.forEach((ack) => {
       checkPageBreak(40);
-      yPos = addWrappedText(ack, margin, yPos, pageWidth - margin * 2, {
-        fontSize: 9.5,
-      });
+      yPos = addJustifiedText(
+        pdf,
+        ack,
+        margin,
+        yPos,
+        pageWidth - margin * 2,
+        { fontSize: 9.5 }
+      );
       yPos += lineHeight * 1.1;
     });
 
     // Employee signature
     yPos += lineHeight * 0.9;
-    const signatureMaxWidth = 200; // Adjust as needed
+    const signatureMaxWidth = 200;
     const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
     signatureLines.forEach((line, i) => {
       addText(line, pageWidth - margin - signatureMaxWidth, yPos + i * lineHeight, {
@@ -775,6 +834,8 @@ async function generateContractPDF(formData, contractData) {
     // Force new page for Annex A
     pdf.addPage();
     yPos = margin;
+
+    yPos += lineHeight * 3;
 
     addText('ANNEX "A"', 0, yPos, {
       fontSize: 16,
@@ -818,7 +879,8 @@ async function generateContractPDF(formData, contractData) {
 
         checkPageBreak(itemPageBreakThreshold);
 
-        yPos = addWrappedText(
+        yPos = addJustifiedText(
+          pdf,
           `• ${item}`,
           margin + 15,
           yPos,
@@ -920,3 +982,170 @@ document.querySelector("form").addEventListener("submit", function (e) {
   e.preventDefault();
   document.getElementById("downloadPdfBtn").click();
 });
+
+// Add markdown initialization function
+function initializeMarkdownParser() {
+  if (typeof window.markdownit === 'undefined') {
+    console.warn('markdown-it library not loaded, falling back to plain text');
+    return null;
+  }
+  
+  return window.markdownit({
+    html: false,        // Disable HTML tags for security
+    xhtmlOut: false,   
+    breaks: true,       // Convert '\n' in paragraphs into line breaks
+    linkify: false,     // Don't auto-convert URLs
+    typographer: true,  // Enable quotes beautification
+  });
+}
+
+// Enhanced function to parse markdown content for PDF rendering
+function parseMarkdownForPDF(text, md) {
+  if (!md) {
+    // Fallback: return plain text segments
+    return [{ text: text, fontStyle: 'normal' }];
+  }
+
+  const tokens = md.parse(text);
+  const segments = [];
+  
+  function processInlineTokens(inlineTokens) {
+    let currentStyle = 'normal';
+    
+    inlineTokens.forEach((token) => {
+      switch (token.type) {
+        case 'text':
+          segments.push({
+            text: token.content,
+            fontStyle: currentStyle
+          });
+          break;
+        case 'strong_open':
+          currentStyle = 'bold';
+          break;
+        case 'strong_close':
+          currentStyle = 'normal';
+          break;
+        case 'em_open':
+          currentStyle = 'italic';
+          break;
+        case 'em_close':
+          currentStyle = 'normal';
+          break;
+        case 'softbreak':
+        case 'hardbreak':
+          segments.push({
+            text: ' ',
+            fontStyle: currentStyle
+          });
+          break;
+      }
+    });
+  }
+  
+  tokens.forEach(token => {
+    if (token.type === 'inline' && token.children) {
+      processInlineTokens(token.children);
+    } else if (token.type === 'paragraph_open') {
+      // Start of paragraph - could add spacing logic here
+    }
+  });
+  
+  return segments;
+}
+
+// Enhanced renderStyledLine function to handle markdown segments
+function renderStyledText(pdf, text, x, y, maxWidth, options = {}) {
+  const md = initializeMarkdownParser();
+  const segments = parseMarkdownForPDF(text, md);
+  
+  const fontSize = options.fontSize || 9.5;
+  const fontFamily = options.fontFamily || 'helvetica';
+  const lineHeight = 13;
+  let currentY = y;
+  
+  pdf.setFontSize(fontSize);
+  
+  // Group segments into lines for justification
+  const lines = [];
+  let currentLine = [];
+  let currentLineWidth = 0;
+  
+  segments.forEach((segment) => {
+    const words = segment.text.split(/\s+/).filter(word => word.trim() !== '');
+    
+    words.forEach((word) => {
+      pdf.setFont(fontFamily, segment.fontStyle || 'normal');
+      const wordWidth = pdf.getTextWidth(word);
+      const spaceWidth = pdf.getTextWidth(' ');
+      
+      // Check if adding this word would exceed the line width
+      if (currentLineWidth + wordWidth + (currentLine.length > 0 ? spaceWidth : 0) > maxWidth && currentLine.length > 0) {
+        // Finish current line and start new one
+        lines.push([...currentLine]);
+        currentLine = [{ text: word, fontStyle: segment.fontStyle, width: wordWidth }];
+        currentLineWidth = wordWidth;
+      } else {
+        // Add word to current line
+        currentLine.push({ text: word, fontStyle: segment.fontStyle, width: wordWidth });
+        currentLineWidth += wordWidth + (currentLine.length > 1 ? spaceWidth : 0);
+      }
+    });
+  });
+  
+  // Add the last line if it has content
+  if (currentLine.length > 0) {
+    lines.push(currentLine);
+  }
+  
+  // Render each line with justification
+  lines.forEach((line, lineIndex) => {
+    // Check for page break
+    if (currentY > pdf.internal.pageSize.getHeight() - 40) {
+      pdf.addPage();
+      currentY = 40;
+    }
+    
+    const isLastLine = lineIndex === lines.length - 1;
+    const totalWordsWidth = line.reduce((sum, word) => sum + word.width, 0);
+    const spaceWidth = pdf.getTextWidth(' ');
+    const totalNormalSpaces = (line.length - 1) * spaceWidth;
+    const availableSpaceWidth = maxWidth - totalWordsWidth;
+    
+    let currentX = x;
+    
+    // Calculate justified spacing (only for non-last lines with multiple words)
+    if (!isLastLine && line.length > 1) {
+      const extraSpace = availableSpaceWidth - totalNormalSpaces;
+      const spacesBetweenWords = line.length - 1;
+      const justifiedSpaceWidth = spaceWidth + (extraSpace / spacesBetweenWords);
+      
+      line.forEach((word, wordIndex) => {
+        pdf.setFont(fontFamily, word.fontStyle || 'normal');
+        pdf.text(word.text, currentX, currentY);
+        currentX += word.width;
+        
+        // Add justified space between words (except after last word)
+        if (wordIndex < line.length - 1) {
+          currentX += justifiedSpaceWidth;
+        }
+      });
+    } else {
+      // Left-align the last line or single-word lines
+      line.forEach((word, wordIndex) => {
+        pdf.setFont(fontFamily, word.fontStyle || 'normal');
+        pdf.text(word.text, currentX, currentY);
+        currentX += word.width;
+        
+        // Add normal space between words (except after last word)
+        if (wordIndex < line.length - 1) {
+          currentX += spaceWidth;
+        }
+      });
+    }
+    
+    currentY += lineHeight;
+  });
+  
+  return currentY;
+}
