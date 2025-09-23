@@ -109,8 +109,8 @@ Instead of editing a large block of HTML, you can now safely edit the contract c
 -   Use Markdown for formatting: `**This will be bold**`.
 -   To change the list items under "Duties and Responsibilities", simply edit the `list` array.
 
-**Example:**
-```javascript'''
+ **Example**
+ ```Javascript``
 // Inside generateContractData() function in js/contracts.js
 const sections = [
     {
@@ -123,8 +123,12 @@ const sections = [
 
 📄 License:
 This project is under the company of Regcris, Tmarks and Prestige.
-
-👨🏻‍💻 Developers:
+### 👨🏻‍💻 Developers:
 [Aron D. Rodriguez](https://www.facebook.com/aronrodriguez01101)
 [John Renzo G. Dacer](https://www.facebook.com/huaxxxxiii)
 [Courtney Love Damasco](https://www.facebook.com/courtney.damasco)
+
+
+
+
+
