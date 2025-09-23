@@ -21,7 +21,7 @@ This project is under the company of Regcris, Tmarks and Prestige.
 
 *(It is highly recommended to add a screenshot or a short GIF of the application in action here. This is the most important part of a UI project's README!)*
 
-![Screenshot of the Contract Generator Dashboard](./path/to/your/screenshot.png)
+![Screenshot of the Contract Generator Dashboard](../DOCUMENT_GENERATOR/assets/images/Screentshot.png)
 
 ---
 
