@@ -110,7 +110,7 @@ Instead of editing a large block of HTML, you can now safely edit the contract c
 -   To change the list items under "Duties and Responsibilities", simply edit the `list` array.
 
 **Example:**
-```javascript
+```javascript'''
 // Inside generateContractData() function in js/contracts.js
 const sections = [
     {
