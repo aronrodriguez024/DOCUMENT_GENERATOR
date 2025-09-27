@@ -734,7 +734,7 @@ async function generateContractPDF(formData, contractData) {
           { fontSize: 9.5 }
         );
       }
-      yPos += lineHeight * 0.9;
+      yPos += lineHeight * 0.2;
 
       if (section.list) {
         section.list.forEach((item, index) => {
@@ -794,7 +794,7 @@ async function generateContractPDF(formData, contractData) {
     addText("HR & Admin Manager", margin + 370, yPos, {
       fontSize: 9.5,
     });
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 3.8;
 
     // Acknowledgement section
     checkPageBreak(75);
