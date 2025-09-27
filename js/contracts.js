@@ -819,7 +819,7 @@ async function generateContractPDF(formData, contractData) {
     });
 
     // Employee signature
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1.9;
     const signatureMaxWidth = 200;
     const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
     signatureLines.forEach((line, i) => {
