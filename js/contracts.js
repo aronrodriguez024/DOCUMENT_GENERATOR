@@ -170,7 +170,7 @@ function generateContractData(formData) {
       title: "ATTENDANCE (30%)",
       items: [
         "Regular na pumapasok at nasa tamang oras.",
-        "Nagpapaalam ng mas maaga kung may planong umabsent. Tinatapos ang lahat ng gawain lalo na kung nagbabalak umabsent.",
+        "Nagpapaalam nang mas maaga kung may planong umabsent. Tinatapos ang lahat ng gawain lalo na kung nagbabalak umabsent.",
       ],
     },
     {
