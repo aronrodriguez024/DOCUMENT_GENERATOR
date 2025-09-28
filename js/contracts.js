@@ -48,10 +48,10 @@ function collectFormData() {
   });
 
   // Format phone number
-  const formattedPhone = `0${phone.substring(0, 3)}-${phone.substring(
+  const formattedPhone = `0${phone.substring(0, 3)}.${phone.substring(
     3,
     6
-  )}-${phone.substring(6, 10)}`;
+  )}.${phone.substring(6, 10)}`;
 
   return {
     companyName,
@@ -78,7 +78,7 @@ function generateContractData(formData) {
   const sections = [
     {
       title: "Probationary Period",
-      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}**. Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
+      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
       useMarkdown: true,
     },
     {
@@ -691,7 +691,7 @@ async function generateContractPDF(formData, contractData) {
     yPos += lineHeight * 1.8;
 
     // Opening paragraph
-    const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}**,`;
+    const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}.**`;
 
     // Use renderStyledText instead of addJustifiedText for markdown parsing
     yPos = renderStyledText(
@@ -750,6 +750,8 @@ async function generateContractPDF(formData, contractData) {
           );
 
           if (section.subList && section.subList[index]) {
+            // Add extra spacing before the sub-list
+            yPos += lineHeight * 0.3; // Adjust this value as needed (e.g., 0.2, 0.3, 0.4)
             section.subList[index].forEach((subItem, subIndex) => {
               checkPageBreak(23);
               const subLetter = String.fromCharCode(97 + subIndex);
