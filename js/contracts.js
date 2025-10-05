@@ -29,6 +29,8 @@ function collectFormData() {
   const client = document.getElementById("client").value;
   const employeeId = document.getElementById("employee-id").value;
   const salary = parseFloat(document.getElementById("salary").value).toFixed(2);
+  const signatoryName = document.getElementById("signatory-name").value;
+  const signatoryPosition = document.getElementById("signatory-position").value;
 
   // Format start date
   const formattedStartDate = startDate.toLocaleString("en-US", {
@@ -70,6 +72,8 @@ function collectFormData() {
     client,
     employeeId,
     salary,
+    signatoryName,
+    signatoryPosition,
   };
 }
 
@@ -444,7 +448,7 @@ function generatePreviewHTML(formData, contractData) {
       <p class="justified closing-statement">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
 
       <div class="signature-block">
-        <p><strong>FERNANDO B. PANGANIBAN</strong><br>HR & Admin Manager</p>
+        <p><strong>${formData.signatoryName}</strong><br>${formData.signatoryPosition}</p>
       </div>
 
       <div class="acknowledgement-heading">
@@ -473,7 +477,8 @@ async function generateContractPDF(formData, contractData) {
     const pdf = new window.jspdf.jsPDF({
       orientation: "portrait",
       unit: "pt",
-      format: [612, 936],
+      format: "letter",
+      // format: [612, 936], For legal size (8.5 x 14 inches)
     });
 
     // PDF dimensions and margins
@@ -787,14 +792,17 @@ async function generateContractPDF(formData, contractData) {
     yPos += lineHeight * 1.8;
 
     yPos += lineHeight * 2;
+
     // Signature
-    addText("FERNANDO B. PANGANIBAN", margin + 330, yPos, {
+    addText(formData.signatoryName, margin + 340, yPos, {
       fontSize: 9.5,
       fontStyle: "bold",
+      align: "left",
     });
     yPos += lineHeight;
-    addText("HR & Admin Manager", margin + 370, yPos, {
+    addText(formData.signatoryPosition, margin + 340, yPos, {
       fontSize: 9.5,
+      align: "left",
     });
     yPos += lineHeight * 3.8;
 
@@ -805,7 +813,7 @@ async function generateContractPDF(formData, contractData) {
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight * 1.3;
+    yPos += lineHeight * 2;
 
     contractData.acknowledgements.forEach((ack) => {
       checkPageBreak(40);
@@ -825,10 +833,10 @@ async function generateContractPDF(formData, contractData) {
     const signatureMaxWidth = 200;
     const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
     signatureLines.forEach((line, i) => {
-      addText(line, pageWidth - margin - signatureMaxWidth, yPos + i * lineHeight, {
+      addText(line, pageWidth - margin - signatureMaxWidth + 10, yPos + i * lineHeight, { // Adjusted x-coordinate by adding 20
         fontSize: 9.5,
         fontStyle: "bold",
-        align: "right",
+        align: "left",
       });
     });
     yPos += lineHeight * signatureLines.length;
@@ -837,27 +845,25 @@ async function generateContractPDF(formData, contractData) {
     pdf.addPage();
     yPos = margin;
 
-    yPos += lineHeight * 3;
-
     addText('ANNEX "A"', 0, yPos, {
-      fontSize: 16,
+      fontSize: 10, // Changed from 16 to 10 to match section headings
       fontStyle: "bold",
       align: "right",
     });
-    yPos += lineHeight * 3.3;
+    yPos += lineHeight * 3;
 
     addText("KEY PERFORMANCE FACTORS AND EXPECTATION PARAMETERS", 0, yPos, {
-      fontSize: 14,
+      fontSize: 10, // Changed from 14 to 10 to match section headings
       fontStyle: "bold",
       align: "center",
     });
     yPos += lineHeight * 1.2;
 
     addText("(Upang magsilbing gabay sa pagtupad ng tungkulin)", 0, yPos, {
-      fontSize: 12,
+      fontSize: 9.5, // Changed from 12 to 9.5 to match body text
       align: "center",
     });
-    yPos += lineHeight * 4.3;
+    yPos += lineHeight * 3;
 
     // KPI sections
     contractData.kpiSections.forEach((section, sectionIndex) => {
@@ -867,10 +873,10 @@ async function generateContractPDF(formData, contractData) {
       checkPageBreak(pageBreakThreshold);
 
       addText(section.title, margin, yPos, {
-        fontSize: 12,
+        fontSize: 10, // Changed from 12 to 10 to match section headings
         fontStyle: "bold",
       });
-      yPos += lineHeight + 4;
+      yPos += lineHeight + 2;
 
       section.items.forEach((item, itemIndex) => {
         const itemPageBreakThreshold =
@@ -887,12 +893,12 @@ async function generateContractPDF(formData, contractData) {
           margin + 15,
           yPos,
           pageWidth - margin * 2 - 15,
-          { fontSize: 11 }
+          { fontSize: 9.5 } // Changed from 11 to 9.5 to match body text
         );
-        yPos += lineHeight * 0.35;
+        yPos += lineHeight * 0.25;
       });
 
-      yPos += lineHeight * 0.9;
+      yPos += lineHeight * 0.6;
     });
 
     return pdf;
@@ -1151,3 +1157,71 @@ function renderStyledText(pdf, text, x, y, maxWidth, options = {}) {
   
   return currentY;
 }
+
+// DOMContentLoaded event listener for initializing form fields
+document.addEventListener('DOMContentLoaded', function () {
+    const companySelect = document.getElementById('company');
+    const startDateInput = document.getElementById('start-date');
+    const companyAddressInput = document.getElementById('company-address');
+    const endDateInput = document.getElementById('end-date');
+
+    function updateReadonlyFields() {
+        const companyKey = companySelect.value;
+        const startDate = new Date(startDateInput.value);
+
+        // Update company address
+        const companyAddressMap = {
+            "trade-marketing": "Room 306 3F CLMC Building, 259 EDSA, Barangay Wack-Wack Greenshills East, Mandaluyong City",
+            "regcris": "2768 Faraday, Makati City, 1234 Metro Manila",
+            "prestige": "3F Lupin Building, 2768 Faraday Street, Barangay San Isidro, Makati City",
+        };
+        companyAddressInput.value = companyAddressMap[companyKey] || '';
+
+        // Calculate and update end date
+        if (!isNaN(startDate)) {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 6);
+            endDate.setDate(endDate.getDate() - 1);
+            endDateInput.value = endDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: '2-digit',
+            });
+        } else {
+            endDateInput.value = '';
+        }
+    }
+
+    // Add event listeners
+    companySelect.addEventListener('change', updateReadonlyFields);
+    startDateInput.addEventListener('input', updateReadonlyFields);
+});
+
+function formatDateMMDDYYYY(date) {
+    if (!(date instanceof Date) || isNaN(date)) return '';
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+
+    function updateEndDate() {
+        const startDate = new Date(startDateInput.value);
+        if (!isNaN(startDate)) {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 6);
+            endDate.setDate(endDate.getDate() - 1);
+            endDateInput.value = formatDateMMDDYYYY(endDate);
+        } else {
+            endDateInput.value = '';
+        }
+    }
+
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('input', updateEndDate);
+    }
+});
