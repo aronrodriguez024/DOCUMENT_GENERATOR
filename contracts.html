@@ -34,7 +34,7 @@
                         Contract
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="contractDropdown">
-                        <li><a class="dropdown-item" href="contracts.html">Employee Contract</a></li>
+                        <li><a class="dropdown-item" href="contracts.html">Placeholder Link 1</a></li>
                         <!-- Add more contract submenu items here -->
                     </ul>
                 </li>
@@ -43,7 +43,7 @@
                         Certification
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="certDropdown">
-                        <li><a class="dropdown-item" href="#">Employment Certificate</a></li>
+                        <li><a class="dropdown-item" href="#">Placeholder Link 2</a></li>
                         <!-- Add more certification submenu items here -->
                     </ul>
                 </li>
@@ -63,6 +63,30 @@
                     <a class="nav-link ps-4" href="#">Templates</a>
                 </li>
             </ul>
+
+            <!-- Kebab Menu - Right side -->
+            <div class="ms-auto">
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark p-2" type="button" id="kebabMenu" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                        <i class="bi bi-three-dots-vertical fs-4"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="kebabMenu">
+                        <li>
+                            <a class="dropdown-item" href="#" id="fullscreenToggle">
+                                <i class="bi bi-fullscreen me-2"></i>
+                                <span id="fullscreenText">Enter Fullscreen</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#" id="closeApp">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Close
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -139,13 +163,25 @@
                         <div class="row">
                             <!-- Left side illustration column -->
                             <div class="col-md-4 mb-3 text-center">
-                                <img src="/document_generator/assets/images/weblogo.png" alt="Contract Illustration" class="img-fluid mb-3" style="max-height: 250px;" draggable="false">
+                                <img src="/document_generator/assets/images/weblogo.png" alt="Contract Illustration" class="img-fluid mb-3" style="max-height: 246px;" draggable="false">
                                 
                                 <!-- Signatory Information -->
                                 <div class="text-start">
-                                    <div class="mb-3">
-                                        <label for="signatory-name" class="form-label">Name of Assigned Signatory <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="signatory-name" value="FERNANDO B. PANGANIBAN" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();" required>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="signatory-name" class="form-label">Name of Assigned Signatory <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="signatory-name" value="FERNANDO B. PANGANIBAN" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();" required>
+                                        </div>
+                                    <div class="col-md-6">
+                                        <label for="signatureInput" class="form-label">E-Signature (PNG/JPG):</label>
+                                        <div class="input-group">
+                                            <input type="file" id="signatureInput" accept="image/*" class="form-control">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="removeSignatureBtn"
+                                                data-bs-toggle="tooltip" title="Remove E-Signature">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="signatory-position" class="form-label">Position of Assigned Signatory <span class="text-danger">*</span></label>
@@ -153,13 +189,13 @@
                                     </div>
                                     
                                     <!-- Weather/Date Widget -->
-                                    <div class="card text-white mt-4" style="background-color: #879ed7;">
+                                    <div class="card text-white mt-4" style="background-color: #879ed7; border: none;">
                                         <div class="card-body p-2 position-relative">
                                             <h1 class="display-5 mb-0">8:00 AM</h1>
                                             <p class="mb-0">Sunday</p>
                                             <p class="mb-0">October 05, 2025</p>
                                             <div class="position-absolute top-0 end-0 m-2 text-end">
-                                                <i class="bi bi-cloud-sun fs-1"></i>
+                                                <i id="weatherIcon" class="bi bi-cloud-sun fs-1"></i>
                                                 <div class="mt-1">
                                                     <div class="h5 mb-0" id="temperature" style="position: relative; bottom: 12px; font-size: 19px;">--°C</div>
                                                     <small id="location" style="position: relative; bottom: 6px; font-size: small;">Manila, Philippines</small>
@@ -193,12 +229,7 @@
 
                                         <div class="mb-3">
                                             <label for="client" class="form-label">Client <span class="text-danger">*</span></label>
-                                            <select class="form-select" id="client" required>
-                                                <option value="">Select Client</option>
-                                                <option value="zesto">Zesto</option>
-                                                <option value="ajinomoto">Ajinomoto</option>
-                                                <option value="comfoods">Comfoods</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="client" style="text-transform: capitalize;" required>
                                         </div>
                                     </div>
 
@@ -249,11 +280,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
-                                            <select class="form-select" id="position" required>
-                                                <option value="">Select Position</option>
-                                                <option value="merchandiser">Merchandiser</option>
-                                                <option value="promodiser">Promodiser</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="position" placeholder="Enter Position" style="text-transform: capitalize;" required>
                                         </div>
                                     </div>
 
@@ -324,6 +351,29 @@
         </div>
     </div>
 
+    <!-- Close Confirmation Modal -->
+    <div class="modal fade" id="closeConfirmModal" tabindex="-1" aria-labelledby="closeConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="closeConfirmLabel">
+                        Confirm Close
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to close this page? Any unsaved changes will be lost.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmCloseBtn">
+                        Yes, Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Contract Preview Modal -->
     <div class="modal fade" id="contractPreviewModal" tabindex="-1" aria-labelledby="contractPreviewLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
@@ -356,6 +406,79 @@
     <script src="/document_generator/js/contracts.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // E-signature close button
+            const signatureInput = document.getElementById('signatureInput');
+            const removeSignatureBtn = document.getElementById('removeSignatureBtn');
+            if (signatureInput && removeSignatureBtn) {
+                removeSignatureBtn.addEventListener('click', function () {
+                signatureInput.value = '';
+                signatureImageDataUrl = null;
+                signatureImageLoaded = Promise.resolve();
+                });
+            }
+
+            // Fullscreen functionality
+            const fullscreenToggle = document.getElementById('fullscreenToggle');
+            const fullscreenText = document.getElementById('fullscreenText');
+            const fullscreenIcon = fullscreenToggle.querySelector('i');
+
+            if (fullscreenToggle) {
+                fullscreenToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (!document.fullscreenElement) {
+                        // Enter fullscreen
+                        document.documentElement.requestFullscreen().then(() => {
+                            fullscreenText.textContent = 'Exit Fullscreen';
+                            fullscreenIcon.className = 'bi bi-fullscreen-exit me-2';
+                        }).catch(err => {
+                            console.error('Error attempting to enable fullscreen:', err);
+                        });
+                    } else {
+                        // Exit fullscreen
+                        document.exitFullscreen().then(() => {
+                            fullscreenText.textContent = 'Enter Fullscreen';
+                            fullscreenIcon.className = 'bi bi-fullscreen me-2';
+                        }).catch(err => {
+                            console.error('Error attempting to exit fullscreen:', err);
+                        });
+                    }
+                });
+
+                // Listen for fullscreen changes (e.g., user presses ESC)
+                document.addEventListener('fullscreenchange', function() {
+                    if (!document.fullscreenElement) {
+                        fullscreenText.textContent = 'Enter Fullscreen';
+                        fullscreenIcon.className = 'bi bi-fullscreen me-2';
+                    }
+                });
+            }
+
+            // Close app functionality with Bootstrap modal
+            const closeApp = document.getElementById('closeApp');
+            const closeConfirmModal = new bootstrap.Modal(document.getElementById('closeConfirmModal'));
+            const confirmCloseBtn = document.getElementById('confirmCloseBtn');
+
+            if (closeApp) {
+                closeApp.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeConfirmModal.show();
+                });
+            }
+
+            if (confirmCloseBtn) {
+                confirmCloseBtn.addEventListener('click', function() {
+                    // Try to close the window
+                    window.close();
+                    
+                    // If window.close() doesn't work (most modern browsers block it for security),
+                    // redirect to a blank page or homepage
+                    setTimeout(function() {
+                        window.location.href = 'about:blank';
+                    }, 100);
+                });
+            }
+
             // Enable/disable Preview button based on form validity
             const contractForm = document.getElementById('contractForm');
             const previewBtn = document.getElementById('previewBtn');
@@ -468,9 +591,9 @@
             
             // Add weather functionality using Open-Meteo API (completely free, no API key needed)
             function getWeatherData() {
-                // Default coordinates for Manila
-                let latitude = 14.6042;
-                let longitude = 120.9822;
+                // Default coordinates for Makati
+                let latitude = 14.5576;
+                let longitude = 121.0240;
                 
                 // Try to get user location for more accurate weather
                 if (navigator.geolocation) {
@@ -496,7 +619,7 @@
             
             // Fetch weather from Open-Meteo API
             function fetchWeather(latitude, longitude) {
-                const weatherIcon = document.querySelector('.card .bi');
+                const weatherIcon = document.getElementById('weatherIcon');
                 const temperatureElement = document.getElementById('temperature');
                 const locationElement = document.getElementById('location');
                 
