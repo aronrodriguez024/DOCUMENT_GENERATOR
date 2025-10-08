@@ -74,6 +74,7 @@ function collectFormData() {
     salary,
     signatoryName,
     signatoryPosition,
+    signatureImageDataUrl,
   };
 }
 
@@ -485,7 +486,7 @@ async function generateContractPDF(formData, contractData) {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 40;
-    const lineHeight = 13;
+    const lineHeight = 11; // Reduced from 13 to 11
     let yPos = margin;
 
     // Load font
@@ -592,7 +593,7 @@ async function generateContractPDF(formData, contractData) {
       return y + lines.length * lineHeight;
     }
 
-    function checkPageBreak(requiredSpace = 45) {
+    function checkPageBreak(requiredSpace = 35) { // Reduced from 45 to 35
       if (yPos + requiredSpace > pageHeight - margin) {
         pdf.addPage();
         yPos = margin;
@@ -641,7 +642,7 @@ async function generateContractPDF(formData, contractData) {
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight + 5;
+    yPos += lineHeight + 3; // Reduced spacing
 
     addText(
       formData.companyAddress,
@@ -652,7 +653,7 @@ async function generateContractPDF(formData, contractData) {
         align: "center",
       }
     );
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 2; // Reduced from 1.8
 
     addText(
       `${formData.employmentType.toUpperCase()} EMPLOYMENT CONTRACT`,
@@ -664,14 +665,14 @@ async function generateContractPDF(formData, contractData) {
         align: "center",
       }
     );
-    yPos += lineHeight * 2.6;
+    yPos += lineHeight * 2.2; // Reduced from 2.6
 
     // Employee info
     addText(formData.name.toUpperCase(), margin, yPos, {
       fontSize: 10,
       fontStyle: "bold",
     });
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1; // Reduced from 0.9
 
     yPos = addJustifiedText(
       pdf,
@@ -681,19 +682,19 @@ async function generateContractPDF(formData, contractData) {
       pageWidth - margin * 2,
       { fontSize: 9.5 }
     );
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1; // Reduced from 0.9
 
     addText(formData.email, margin, yPos, { fontSize: 9.5 });
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1; // Reduced from 0.9
 
     addText(formData.formattedPhone, margin, yPos, { fontSize: 9.5 });
-    yPos += lineHeight * 2.3;
+    yPos += lineHeight * 1.8; // Reduced from 2.3
 
     // Greeting
     addText("Sir/Ma'am;", margin, yPos, {
       fontSize: 9.5,
     });
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 1.4; // Reduced from 1.8
 
     // Opening paragraph
     const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}.**`;
@@ -707,17 +708,17 @@ async function generateContractPDF(formData, contractData) {
       pageWidth - margin * 2,
       { fontSize: 9.5, fontFamily: fontFamily }
     );
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 0.7; // Reduced from 0.9
 
     // Add sections
     contractData.sections.forEach((section) => {
-      checkPageBreak(45);
+      checkPageBreak(35); // Reduced from 45
 
       addText(section.title, margin, yPos, {
         fontSize: 10,
         fontStyle: "bold",
       });
-      yPos += lineHeight + 4;
+      yPos += lineHeight + 2; // Reduced spacing
 
       // Check if section should use markdown rendering
       if (section.useMarkdown) {
@@ -727,7 +728,7 @@ async function generateContractPDF(formData, contractData) {
           margin,
           yPos,
           pageWidth - margin * 2,
-          { fontSize: 9.5, fontFamily: fontFamily } // Add fontFamily to options
+          { fontSize: 9.5, fontFamily: fontFamily }
         );
       } else {
         yPos = addJustifiedText(
@@ -739,11 +740,11 @@ async function generateContractPDF(formData, contractData) {
           { fontSize: 9.5 }
         );
       }
-      yPos += lineHeight * 0.2;
+      yPos += lineHeight * 0.1; // Reduced from 0.2
 
       if (section.list) {
         section.list.forEach((item, index) => {
-          checkPageBreak(28);
+          checkPageBreak(22); // Reduced from 28
           let listText = `${index + 1}. ${item}`;
           yPos = addJustifiedText(
             pdf,
@@ -756,9 +757,9 @@ async function generateContractPDF(formData, contractData) {
 
           if (section.subList && section.subList[index]) {
             // Add extra spacing before the sub-list
-            yPos += lineHeight * 0.3; // Adjust this value as needed (e.g., 0.2, 0.3, 0.4)
+            yPos += lineHeight * 0.2; // Reduced from 0.3
             section.subList[index].forEach((subItem, subIndex) => {
-              checkPageBreak(23);
+              checkPageBreak(18); // Reduced from 23
               const subLetter = String.fromCharCode(97 + subIndex);
               yPos = addJustifiedText(
                 pdf,
@@ -768,19 +769,19 @@ async function generateContractPDF(formData, contractData) {
                 pageWidth - margin * 2 - 35,
                 { fontSize: 9.5 }
               );
-              yPos += lineHeight * 0.25;
+              yPos += lineHeight * 0.15; // Reduced from 0.25
             });
           }
 
-          yPos += lineHeight * 0.4;
+          yPos += lineHeight * 0.3; // Reduced from 0.4
         });
       }
 
-      yPos += lineHeight * 0.9;
+      yPos += lineHeight * 0.7; // Reduced from 0.9
     });
 
     // Closing statement
-    checkPageBreak(35);
+    checkPageBreak(25); // Reduced from 35
     yPos = addJustifiedText(
       pdf,
       "We welcome you into our organization and trust that your association with us will be mutually beneficial!",
@@ -789,34 +790,48 @@ async function generateContractPDF(formData, contractData) {
       pageWidth - margin * 2,
       { fontSize: 9.5 }
     );
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 1.4; // Reduced from 1.8
 
-    yPos += lineHeight * 2;
+    yPos += lineHeight * 4; // Reduced from 2
 
-    // Signature
-    addText(formData.signatoryName, margin + 340, yPos, {
+    // --- Place e-signature image above signatory's name ---
+    const signatoryBlockX = margin + 340;
+    const signatoryBlockY = yPos; // Save current yPos
+
+    // Draw e-signature image above signatory name, but do NOT adjust yPos
+    if (formData.signatureImageDataUrl) {
+      const imgWidth = 120; // px
+      const imgHeight = 40; // px
+      const imgX = signatoryBlockX;
+      const imgY = signatoryBlockY - imgHeight - 8; // 8pt spacing above name
+
+      pdf.addImage(formData.signatureImageDataUrl, 'PNG', imgX, imgY, imgWidth, imgHeight);
+    }
+
+    // Signatory name and position (always at signatoryBlockY)
+    let ySignatory = signatoryBlockY;
+    ySignatory = addWrappedText(formData.signatoryName, signatoryBlockX, ySignatory, 200, {
       fontSize: 9.5,
       fontStyle: "bold",
       align: "left",
     });
-    yPos += lineHeight;
-    addText(formData.signatoryPosition, margin + 340, yPos, {
+    ySignatory = addWrappedText(formData.signatoryPosition, signatoryBlockX, ySignatory, 200, {
       fontSize: 9.5,
       align: "left",
     });
-    yPos += lineHeight * 3.8;
+    yPos += lineHeight * 5; // spacing after block
 
     // Acknowledgement section
-    checkPageBreak(75);
+    checkPageBreak(60); // Reduced from 75
     addText("ACKNOWLEDGEMENT, CONSENT AND UNDERTAKING", 0, yPos, {
       fontSize: 10,
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight * 2;
+    yPos += lineHeight * 1.6; // Reduced from 2
 
     contractData.acknowledgements.forEach((ack) => {
-      checkPageBreak(40);
+      checkPageBreak(30); // Reduced from 40
       yPos = addJustifiedText(
         pdf,
         ack,
@@ -825,15 +840,15 @@ async function generateContractPDF(formData, contractData) {
         pageWidth - margin * 2,
         { fontSize: 9.5 }
       );
-      yPos += lineHeight * 1.1;
+      yPos += lineHeight * 0.9; // Reduced from 1.1
     });
 
     // Employee signature
-    yPos += lineHeight * 1.9;
+    yPos += lineHeight * 3.5; // Reduced from 1.9
     const signatureMaxWidth = 200;
     const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
     signatureLines.forEach((line, i) => {
-      addText(line, pageWidth - margin - signatureMaxWidth + 10, yPos + i * lineHeight, { // Adjusted x-coordinate by adding 20
+      addText(line, pageWidth - margin - signatureMaxWidth + 10, yPos + i * lineHeight, {
         fontSize: 9.5,
         fontStyle: "bold",
         align: "left",
@@ -843,47 +858,53 @@ async function generateContractPDF(formData, contractData) {
 
     // Force new page for Annex A
     pdf.addPage();
-    yPos = margin;
+
+    // Calculate vertical center position
+    const annexAHeight = calculateAnnexAHeight(contractData, lineHeight, margin, pageWidth);
+    const availableHeight = pageHeight - (margin * 2);
+    const startY = margin + ((availableHeight - annexAHeight) / 2);
+
+    // Use the centered starting position
+    yPos = Math.max(margin, startY); // Ensure we don't go above the margin
 
     addText('ANNEX "A"', 0, yPos, {
-      fontSize: 10, // Changed from 16 to 10 to match section headings
+      fontSize: 10,
       fontStyle: "bold",
       align: "right",
     });
-    yPos += lineHeight * 3;
+    yPos += lineHeight * 2.5;
 
     addText("KEY PERFORMANCE FACTORS AND EXPECTATION PARAMETERS", 0, yPos, {
-      fontSize: 10, // Changed from 14 to 10 to match section headings
+      fontSize: 10,
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight * 1.2;
+    yPos += lineHeight;
 
     addText("(Upang magsilbing gabay sa pagtupad ng tungkulin)", 0, yPos, {
-      fontSize: 9.5, // Changed from 12 to 9.5 to match body text
+      fontSize: 9.5,
       align: "center",
     });
-    yPos += lineHeight * 3;
+    yPos += lineHeight * 2.5;
 
     // KPI sections
     contractData.kpiSections.forEach((section, sectionIndex) => {
       const pageBreakThreshold =
-        sectionIndex === contractData.kpiSections.length - 1 ? 110 : 45;
+        sectionIndex === contractData.kpiSections.length - 1 ? 90 : 35;
 
       checkPageBreak(pageBreakThreshold);
 
       addText(section.title, margin, yPos, {
-        fontSize: 10, // Changed from 12 to 10 to match section headings
+        fontSize: 10,
         fontStyle: "bold",
       });
-      yPos += lineHeight + 2;
+      yPos += lineHeight + 1;
 
       section.items.forEach((item, itemIndex) => {
         const itemPageBreakThreshold =
           sectionIndex === contractData.kpiSections.length - 1 &&
           itemIndex === section.items.length - 1
-            ? 75
-            : 28;
+            ? 60 : 22;
 
         checkPageBreak(itemPageBreakThreshold);
 
@@ -893,12 +914,12 @@ async function generateContractPDF(formData, contractData) {
           margin + 15,
           yPos,
           pageWidth - margin * 2 - 15,
-          { fontSize: 9.5 } // Changed from 11 to 9.5 to match body text
+          { fontSize: 9.5 }
         );
-        yPos += lineHeight * 0.25;
+        yPos += lineHeight * 0.15;
       });
 
-      yPos += lineHeight * 0.6;
+      yPos += lineHeight * 0.4;
     });
 
     return pdf;
@@ -906,6 +927,39 @@ async function generateContractPDF(formData, contractData) {
     console.error("PDF generation error:", error);
     throw error;
   }
+}
+
+// Helper function to calculate Annex A content height
+function calculateAnnexAHeight(contractData, lineHeight, margin, pageWidth) {
+  let totalHeight = 0;
+  
+  // ANNEX "A" title
+  totalHeight += lineHeight * 2.5;
+  
+  // Main heading
+  totalHeight += lineHeight;
+  
+  // Subtitle
+  totalHeight += lineHeight * 2.5;
+  
+  // Calculate height for each KPI section
+  contractData.kpiSections.forEach((section) => {
+    // Section title
+    totalHeight += lineHeight + 1;
+    
+    // Each item in the section
+    section.items.forEach((item) => {
+      // Estimate lines needed for each item (approximate calculation)
+      const maxWidth = pageWidth - margin * 2 - 15;
+      const estimatedLines = Math.ceil(item.length / (maxWidth / 6)); // Rough estimate
+      totalHeight += (estimatedLines * lineHeight) + (lineHeight * 0.15);
+    });
+    
+    // Section spacing
+    totalHeight += lineHeight * 0.4;
+  });
+  
+  return totalHeight;
 }
 
 // Preview button event listener (modified)
@@ -917,17 +971,21 @@ document
       loader.classList.remove("d-none");
       this.disabled = true;
 
+      // Wait for signature image to be loaded
+      await signatureImageLoaded;
+
       const formData = collectFormData();
       const contractData = generateContractData(formData);
 
       // Generate the PDF and store it for later download
       const pdf = await generateContractPDF(formData, contractData);
 
-      // Convert the PDF to a data URL for preview
-      const pdfData = pdf.output("datauristring");
+      // Convert the PDF to a Blob for preview
+      const pdfBlob = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
 
       // Create an iframe to display the PDF
-      const previewFrame = `<iframe src="${pdfData}" width="100%" height="100%" style="border: none; min-height: 70vh; max-height: 80vh;" class="responsive-pdf-iframe"></iframe>`;
+      const previewFrame = `<iframe src="${pdfUrl}" width="100%" height="100%" style="border: none; min-height: 70vh; max-height: 80vh;" class="responsive-pdf-iframe"></iframe>`;
 
       // Update the preview modal with the iframe
       document.getElementById("contractPreviewBody").innerHTML = previewFrame;
@@ -1069,7 +1127,7 @@ function renderStyledText(pdf, text, x, y, maxWidth, options = {}) {
   
   const fontSize = options.fontSize || 9.5;
   const fontFamily = options.fontFamily || 'helvetica';
-  const lineHeight = 13;
+  const lineHeight = 11; // Reduced from 13 to match the main lineHeight
   let currentY = y;
   
   pdf.setFontSize(fontSize);
@@ -1225,3 +1283,46 @@ document.addEventListener('DOMContentLoaded', function () {
         startDateInput.addEventListener('input', updateEndDate);
     }
 });
+
+let signatureImageDataUrl = null;
+let signatureImageLoaded = Promise.resolve();
+
+document.addEventListener('DOMContentLoaded', function () {
+  const signatureInput = document.getElementById('signatureInput');
+  if (signatureInput) {
+    signatureInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        signatureImageLoaded = new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = async function (evt) {
+            signatureImageDataUrl = await resizeImage(evt.target.result, 400);
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      } else {
+        signatureImageDataUrl = null;
+        signatureImageLoaded = Promise.resolve();
+      }
+    });
+  }
+});
+
+async function resizeImage(dataUrl, maxWidth = 400) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = function () {
+      const scale = Math.min(1, maxWidth / img.width);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.src = dataUrl;
+  });
+}
