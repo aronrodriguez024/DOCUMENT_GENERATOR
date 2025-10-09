@@ -975,7 +975,8 @@ document
       await signatureImageLoaded;
 
       const formData = collectFormData();
-      const contractData = generateContractData(formData);
+      // Use custom contract data if available, otherwise generate default
+      const contractData = customContractData || generateContractData(formData);
 
       // Generate the PDF and store it for later download
       const pdf = await generateContractPDF(formData, contractData);
@@ -1029,8 +1030,8 @@ document
       if (window.generatedPdf) {
         window.generatedPdf.save(fileName);
       } else {
-        // Otherwise generate a new PDF (fallback)
-        const contractData = generateContractData(formData);
+        // Use custom contract data if available
+        const contractData = customContractData || generateContractData(formData);
         generateContractPDF(formData, contractData).then((pdf) => {
           pdf.save(fileName);
         });
@@ -1325,4 +1326,641 @@ async function resizeImage(dataUrl, maxWidth = 400) {
     };
     img.src = dataUrl;
   });
+}
+
+// Add these variables at the top of your file, after existing variable declarations
+let customContractData = null;
+let originalContractData = null;
+
+// Add this function to handle the Edit button click
+document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('editBtn');
+    if (editBtn) {
+        editBtn.addEventListener('click', function() {
+            openContractEditor();
+        });
+    }
+
+    // Add event listener for Edit button in preview modal
+    const editFromPreviewBtn = document.getElementById('editFromPreviewBtn');
+    if (editFromPreviewBtn) {
+        editFromPreviewBtn.addEventListener('click', function() {
+            // Close the preview modal
+            const previewModal = bootstrap.Modal.getInstance(document.getElementById('contractPreviewModal'));
+            if (previewModal) {
+                previewModal.hide();
+            }
+            
+            // Open the editor modal
+            openContractEditor();
+        });
+    }
+
+    // Initialize the editor save button
+    const saveContractEdits = document.getElementById('saveContractEdits');
+    if (saveContractEdits) {
+        saveContractEdits.addEventListener('click', function() {
+            saveContractEditorChanges();
+        });
+    }
+});
+
+// Function to open the contract editor modal
+function openContractEditor() {
+    // Get the form data
+    const formData = collectFormData();
+    
+    // Generate the default contract data
+    originalContractData = generateContractData(formData);
+    
+    // Use custom data if available, otherwise use original data
+    const contractData = customContractData || originalContractData;
+    
+    // Populate the editor with contract data
+    populateContractEditor(contractData);
+    
+    // Show the modal
+    const editorModal = new bootstrap.Modal(document.getElementById('contractEditorModal'));
+    editorModal.show();
+}
+
+// Function to populate the contract editor with data
+function populateContractEditor(contractData) {
+    // Clear existing content
+    const sectionsContainer = document.getElementById('contractSectionsContainer');
+    const acknowledgementsContainer = document.getElementById('acknowledgementsContainer');
+    const kpiSectionsContainer = document.getElementById('kpiSectionsContainer');
+    
+    sectionsContainer.innerHTML = '';
+    acknowledgementsContainer.innerHTML = '';
+    kpiSectionsContainer.innerHTML = '';
+    
+    // Populate contract sections
+    contractData.sections.forEach((section, index) => {
+        const sectionEditor = document.createElement('div');
+        sectionEditor.className = 'card mb-3';
+        sectionEditor.innerHTML = `
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Section ${index + 1}: ${section.title}</h6>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="useMarkdown-${index}" ${section.useMarkdown ? 'checked' : ''}>
+                    <label class="form-check-label" for="useMarkdown-${index}">Use Markdown</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="section-title-${index}" class="form-label">Title:</label>
+                    <input type="text" class="form-control" id="section-title-${index}" value="${section.title}">
+                </div>
+                <div class="mb-3">
+                    <label for="section-content-${index}" class="form-label">Content:</label>
+                    <textarea class="form-control" id="section-content-${index}" rows="4">${section.content}</textarea>
+                </div>
+                ${section.list ? renderListEditor(section, index) : ''}
+            </div>
+        `;
+        sectionsContainer.appendChild(sectionEditor);
+    });
+    
+    // Populate acknowledgements
+    contractData.acknowledgements.forEach((ack, index) => {
+        const ackEditor = document.createElement('div');
+        ackEditor.className = 'mb-3';
+        ackEditor.innerHTML = `
+            <label for="acknowledgement-${index}" class="form-label">Acknowledgement ${index + 1}:</label>
+            <textarea class="form-control" id="acknowledgement-${index}" rows="4">${ack}</textarea>
+        `;
+        acknowledgementsContainer.appendChild(ackEditor);
+    });
+    
+    // Populate KPI sections
+    contractData.kpiSections.forEach((section, index) => {
+        const kpiEditor = document.createElement('div');
+        kpiEditor.className = 'card mb-3';
+        kpiEditor.innerHTML = `
+            <div class="card-header bg-light">
+                <h6 class="mb-0">KPI Section: ${section.title}</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="kpi-title-${index}" class="form-label">Title:</label>
+                    <input type="text" class="form-control" id="kpi-title-${index}" value="${section.title}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Items:</label>
+                    <div id="kpi-items-container-${index}">
+                        ${renderKpiItems(section.items, index)}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addKpiItem(${index})">
+                        <i class="bi bi-plus-circle"></i> Add Item
+                    </button>
+                </div>
+            </div>
+        `;
+        kpiSectionsContainer.appendChild(kpiEditor);
+    });
+}
+
+// Function to render list editor for a section
+function renderListEditor(section, sectionIndex) {
+    let html = `
+        <div class="mb-3">
+            <label class="form-label">List Items:</label>
+            <div id="list-items-container-${sectionIndex}">
+    `;
+    
+    section.list.forEach((item, itemIndex) => {
+        html += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">${itemIndex + 1}.</span>
+                <input type="text" class="form-control" id="list-item-${sectionIndex}-${itemIndex}" value="${item}">
+                <button class="btn btn-outline-danger" type="button" onclick="removeListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleSubList(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        `;
+        
+        // Add sub-list if available
+        if (section.subList && section.subList[itemIndex]) {
+            html += `<div class="ms-4 mb-2" id="sub-list-container-${sectionIndex}-${itemIndex}">`;
+            section.subList[itemIndex].forEach((subItem, subIndex) => {
+                html += `
+                    <div class="input-group mb-2" data-sub-item="true">
+                        <span class="input-group-text">${String.fromCharCode(97 + subIndex)})</span>
+                        <input type="text" class="form-control" id="sub-item-${sectionIndex}-${itemIndex}-${subIndex}" value="${subItem}">
+                        <button class="btn btn-outline-danger" type="button" onclick="removeSubListItem(${sectionIndex}, ${itemIndex}, ${subIndex})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addSubListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-plus-circle"></i> Add Sub-item
+                </button>
+            </div>`;
+        }
+    });
+    
+    html += `
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addListItem(${sectionIndex})">
+                <i class="bi bi-plus-circle"></i> Add List Item
+            </button>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Function to render KPI items
+function renderKpiItems(items, sectionIndex) {
+    let html = '';
+    items.forEach((item, itemIndex) => {
+        html += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">•</span>
+                <input type="text" class="form-control" id="kpi-item-${sectionIndex}-${itemIndex}" value="${item}">
+                <button class="btn btn-outline-danger" type="button" onclick="removeKpiItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+    });
+    return html;
+}
+
+// Helper functions for list management
+function addListItem(sectionIndex) {
+    const container = document.getElementById(`list-items-container-${sectionIndex}`);
+    const itemIndex = container.querySelectorAll('.input-group:not([data-sub-item="true"])').length;
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'input-group mb-2';
+    newItem.innerHTML = `
+        <span class="input-group-text">${itemIndex + 1}.</span>
+        <input type="text" class="form-control" id="list-item-${sectionIndex}-${itemIndex}" value="">
+        <button class="btn btn-outline-danger" type="button" onclick="removeListItem(${sectionIndex}, ${itemIndex})">
+            <i class="bi bi-trash"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" onclick="toggleSubList(${sectionIndex}, ${itemIndex})">
+            <i class="bi bi-list"></i>
+        </button>
+    `;
+    container.appendChild(newItem);
+    
+    // Update all item numbers to ensure they're sequential
+    renumberListItems(sectionIndex);
+}
+
+function removeListItem(sectionIndex, itemIndex) {
+    // Get all main items in the container
+    const container = document.getElementById(`list-items-container-${sectionIndex}`);
+    const items = Array.from(container.querySelectorAll('.input-group:not([data-sub-item="true"])'));
+    
+    // Remove the specified item
+    if (itemIndex < items.length) {
+        items[itemIndex].remove();
+        
+        // Also remove any sub-list for this item
+        const subListContainer = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+        if (subListContainer) {
+            subListContainer.remove();
+        }
+        
+        // Renumber all items and update sub-list IDs
+        renumberListItems(sectionIndex);
+    }
+}
+
+// Function to toggle a sub-list for a list item
+function toggleSubList(sectionIndex, itemIndex) {
+    // Check if sub-list container exists
+    let subListContainer = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+    
+    if (!subListContainer) {
+        // Create new sub-list container
+        const listItem = document.getElementById(`list-item-${sectionIndex}-${itemIndex}`).closest('.input-group');
+        
+        subListContainer = document.createElement('div');
+        subListContainer.id = `sub-list-container-${sectionIndex}-${itemIndex}`;
+        subListContainer.className = 'ms-4 mb-2';
+        
+        // Add the container after the list item
+        listItem.parentNode.insertBefore(subListContainer, listItem.nextSibling);
+        
+        // Add the first sub-item
+        addSubListItem(sectionIndex, itemIndex);
+    } else {
+        // Toggle visibility
+        if (subListContainer.style.display === 'none') {
+            subListContainer.style.display = '';
+        } else {
+            subListContainer.style.display = 'none';
+        }
+    }
+}
+
+// Function to add a sub-list item
+function addSubListItem(sectionIndex, itemIndex) {
+    // Find or create the sub-list container
+    let container = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+    if (!container) {
+        container = document.createElement('div');
+        container.id = `sub-list-container-${sectionIndex}-${itemIndex}`;
+        container.className = 'ms-4 mb-2';
+        
+        // Find the list item to append the sub-list after
+        const listItem = document.getElementById(`list-item-${sectionIndex}-${itemIndex}`).closest('.input-group');
+        listItem.parentNode.insertBefore(container, listItem.nextSibling);
+    }
+    
+    const subItems = container.querySelectorAll('.input-group');
+    const subIndex = subItems.length;
+    const letter = String.fromCharCode(97 + subIndex);
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'input-group mb-2';
+    newItem.setAttribute('data-sub-item', 'true');
+    newItem.innerHTML = `
+        <span class="input-group-text">${letter})</span>
+        <input type="text" class="form-control" id="sub-item-${sectionIndex}-${itemIndex}-${subIndex}" value="">
+        <button class="btn btn-outline-danger" type="button" onclick="removeSubListItem(${sectionIndex}, ${itemIndex}, ${subIndex})">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    
+    // Add the new sub-item
+    if (subIndex === 0) {
+        container.appendChild(newItem);
+        
+        // Add button for adding more sub-items
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'btn btn-sm btn-outline-secondary mt-1';
+        addButton.innerHTML = '<i class="bi bi-plus-circle"></i> Add Sub-item';
+        addButton.setAttribute('onclick', `addSubListItem(${sectionIndex}, ${itemIndex})`);
+        container.appendChild(addButton);
+    } else {
+        // Find the button and insert before it
+        const addButton = container.querySelector('button.btn-outline-secondary');
+        container.insertBefore(newItem, addButton);
+    }
+}
+
+// Function to remove a sub-list item
+function removeSubListItem(sectionIndex, itemIndex, subIndex) {
+    const container = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+    const subItems = container.querySelectorAll('.input-group');
+    
+    // Remove the specified item
+    if (subIndex < subItems.length) {
+        subItems[subIndex].remove();
+        
+        // Re-letter the remaining sub-items
+        const remainingItems = container.querySelectorAll('.input-group');
+        remainingItems.forEach((item, idx) => {
+            const letterSpan = item.querySelector('.input-group-text');
+            if (letterSpan) {
+                letterSpan.textContent = `${String.fromCharCode(97 + idx)})`;
+            }
+            
+            // Update the input and button IDs
+            const input = item.querySelector('input');
+            if (input) {
+                input.id = `sub-item-${sectionIndex}-${itemIndex}-${idx}`;
+            }
+            
+            const button = item.querySelector('button');
+            if (button) {
+                button.setAttribute('onclick', `removeSubListItem(${sectionIndex}, ${itemIndex}, ${idx})`);
+            }
+        });
+        
+        // If no more sub-items, remove the container and the button
+        if (remainingItems.length === 0) {
+            container.remove();
+        }
+    }
+}
+
+// Function to renumber list items after adding/removing
+function renumberListItems(sectionIndex) {
+    const container = document.getElementById(`list-items-container-${sectionIndex}`);
+    const mainItems = Array.from(container.querySelectorAll('.input-group:not([data-sub-item="true"])'));
+    
+    mainItems.forEach((item, newIndex) => {
+        // Update number in UI
+        const numberSpan = item.querySelector('.input-group-text');
+        if (numberSpan) {
+            numberSpan.textContent = `${newIndex + 1}.`;
+        }
+        
+        // Get the old index from the input ID
+        const input = item.querySelector('input');
+        const oldIndex = parseInt(input.id.split('-')[2]);
+        
+        // Update input ID
+        input.id = `list-item-${sectionIndex}-${newIndex}`;
+        
+        // Update buttons
+        const buttons = item.querySelectorAll('button');
+        buttons.forEach(button => {
+            if (button.innerHTML.includes('bi-trash')) {
+                button.setAttribute('onclick', `removeListItem(${sectionIndex}, ${newIndex})`);
+            }
+            if (button.innerHTML.includes('bi-list')) {
+                button.setAttribute('onclick', `toggleSubList(${sectionIndex}, ${newIndex})`);
+            }
+        });
+        
+        // Update sub-list container if it exists
+        const oldSubList = document.getElementById(`sub-list-container-${sectionIndex}-${oldIndex}`);
+        if (oldSubList) {
+            oldSubList.id = `sub-list-container-${sectionIndex}-${newIndex}`;
+            
+            // Update sub-list items
+            const subItems = oldSubList.querySelectorAll('.input-group');
+            subItems.forEach((subItem, subIndex) => {
+                // Update input ID
+                const subInput = subItem.querySelector('input');
+                subInput.id = `sub-item-${sectionIndex}-${newIndex}-${subIndex}`;
+                
+                // Update remove button
+                const removeBtn = subItem.querySelector('button');
+                removeBtn.setAttribute('onclick', `removeSubListItem(${sectionIndex}, ${newIndex}, ${subIndex})`);
+            });
+            
+            // Update add button
+            const addSubBtn = oldSubList.querySelector('button.btn-outline-secondary');
+            if (addSubBtn) {
+                addSubBtn.setAttribute('onclick', `addSubListItem(${sectionIndex}, ${newIndex})`);
+            }
+        }
+    });
+}
+
+// Update renderListEditor to include the toggle sub-list button
+function renderListEditor(section, sectionIndex) {
+    let html = `
+        <div class="mb-3">
+            <label class="form-label">List Items:</label>
+            <div id="list-items-container-${sectionIndex}">
+    `;
+    
+    section.list.forEach((item, itemIndex) => {
+        html += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">${itemIndex + 1}.</span>
+                <input type="text" class="form-control" id="list-item-${sectionIndex}-${itemIndex}" value="${item}">
+                <button class="btn btn-outline-danger" type="button" onclick="removeListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleSubList(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        `;
+        
+        // Add sub-list if available
+        if (section.subList && section.subList[itemIndex]) {
+            html += `<div class="ms-4 mb-2" id="sub-list-container-${sectionIndex}-${itemIndex}">`;
+            section.subList[itemIndex].forEach((subItem, subIndex) => {
+                html += `
+                    <div class="input-group mb-2" data-sub-item="true">
+                        <span class="input-group-text">${String.fromCharCode(97 + subIndex)})</span>
+                        <input type="text" class="form-control" id="sub-item-${sectionIndex}-${itemIndex}-${subIndex}" value="${subItem}">
+                        <button class="btn btn-outline-danger" type="button" onclick="removeSubListItem(${sectionIndex}, ${itemIndex}, ${subIndex})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addSubListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-plus-circle"></i> Add Sub-item
+                </button>
+            </div>`;
+        }
+    });
+    
+    html += `
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addListItem(${sectionIndex})">
+                <i class="bi bi-plus-circle"></i> Add List Item
+            </button>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Function to save contract editor changes
+function saveContractEditorChanges() {
+    try {
+        // Get the form data to use for generating the structure
+        const formData = collectFormData();
+        
+        // Create a new contract data object with the edited values
+        const editedContractData = {
+            sections: [],
+            acknowledgements: [],
+            kpiSections: []
+        };
+        
+        // Collect edited sections
+        const sectionsContainer = document.getElementById('contractSectionsContainer');
+        const sectionCards = sectionsContainer.querySelectorAll('.card');
+        
+        sectionCards.forEach((card, index) => {
+            const title = document.getElementById(`section-title-${index}`).value;
+            const content = document.getElementById(`section-content-${index}`).value;
+            const useMarkdown = document.getElementById(`useMarkdown-${index}`).checked;
+            
+            const section = {
+                title: title,
+                content: content,
+                useMarkdown: useMarkdown
+            };
+            
+            // Collect list items if they exist
+            const listContainer = document.getElementById(`list-items-container-${index}`);
+            if (listContainer) {
+                const listItems = [];
+                const subListItems = {};
+                
+                // Get all main list items
+                const mainItems = listContainer.querySelectorAll('.input-group:not([data-sub-item="true"])');
+                mainItems.forEach((item, itemIndex) => {
+                    const input = item.querySelector('input');
+                    if (input && input.value.trim()) {
+                        listItems.push(input.value);
+                        
+                        // Check for sub-items
+                        const subContainer = document.getElementById(`sub-list-container-${index}-${itemIndex}`);
+                        if (subContainer) {
+                            const subInputs = subContainer.querySelectorAll('input');
+                            const subItems = [];
+                            subInputs.forEach(subInput => {
+                                if (subInput.value.trim()) {
+                                    subItems.push(subInput.value);
+                                }
+                            });
+                            if (subItems.length > 0) {
+                                subListItems[itemIndex] = subItems;
+                            }
+                        }
+                    }
+                });
+                
+                if (listItems.length > 0) {
+                    section.list = listItems;
+                    if (Object.keys(subListItems).length > 0) {
+                        section.subList = subListItems;
+                    }
+                }
+            }
+            
+            editedContractData.sections.push(section);
+        });
+        
+        // Collect edited acknowledgements
+        const acknowledgementsContainer = document.getElementById('acknowledgementsContainer');
+        const ackTextareas = acknowledgementsContainer.querySelectorAll('textarea');
+        ackTextareas.forEach(textarea => {
+            if (textarea.value.trim()) {
+                editedContractData.acknowledgements.push(textarea.value);
+            }
+        });
+        
+        // Collect edited KPI sections
+        const kpiContainer = document.getElementById('kpiSectionsContainer');
+        const kpiCards = kpiContainer.querySelectorAll('.card');
+        
+        kpiCards.forEach((card, index) => {
+            const title = document.getElementById(`kpi-title-${index}`).value;
+            const itemsContainer = document.getElementById(`kpi-items-container-${index}`);
+            const items = [];
+            
+            const itemInputs = itemsContainer.querySelectorAll('input');
+            itemInputs.forEach(input => {
+                if (input.value.trim()) {
+                    items.push(input.value);
+                }
+            });
+            
+            if (items.length > 0) {
+                editedContractData.kpiSections.push({
+                    title: title,
+                    items: items
+                });
+            }
+        });
+        
+        // Store the edited contract data globally
+        customContractData = editedContractData;
+        
+        // Close the editor modal
+        const editorModal = bootstrap.Modal.getInstance(document.getElementById('contractEditorModal'));
+        if (editorModal) {
+            editorModal.hide();
+        }
+        
+        // Show success alert instead of browser alert
+        showAlert('Contract changes saved successfully!', 'success');
+        
+        // Clear the cached PDF so it regenerates with new data
+        window.generatedPdf = null;
+        
+    } catch (error) {
+        console.error('Error saving contract changes:', error);
+               // Show error alert instead of browser alert
+        showAlert('An error occurred while saving changes. Please try again.', 'danger');
+    }
+}
+
+// Function to show Bootstrap alert
+function showAlert(message, type = 'success') {
+    // Remove any existing alerts
+    const existingAlert = document.querySelector('.custom-alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show custom-alert`;
+    alertDiv.setAttribute('role', 'alert');
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '80px';
+    alertDiv.style.left = '50%';
+    alertDiv.style.transform = 'translateX(-50%)';
+    alertDiv.style.zIndex = '1030';
+    alertDiv.style.minWidth = '300px';
+    alertDiv.style.maxWidth = '500px';
+    alertDiv.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Add to body
+    document.body.appendChild(alertDiv);
+
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv && alertDiv.parentElement) {
+            const bsAlert = bootstrap.Alert.getInstance(alertDiv);
+            if (bsAlert) {
+                bsAlert.close();
+            } else {
+                alertDiv.remove();
+            }
+        }
+    }, 5000);
 }
