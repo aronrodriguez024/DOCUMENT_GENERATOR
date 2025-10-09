@@ -1964,3 +1964,47 @@ function showAlert(message, type = 'success') {
         }
     }, 5000);
 }
+
+// Function to add a new KPI item
+function addKpiItem(sectionIndex) {
+    const container = document.getElementById(`kpi-items-container-${sectionIndex}`);
+    const itemIndex = container.querySelectorAll('.input-group').length;
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'input-group mb-2';
+    newItem.innerHTML = `
+        <span class="input-group-text">•</span>
+        <input type="text" class="form-control" id="kpi-item-${sectionIndex}-${itemIndex}" value="">
+        <button class="btn btn-outline-danger" type="button" onclick="removeKpiItem(${sectionIndex}, ${itemIndex})">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    container.appendChild(newItem);
+}
+
+// Function to remove a KPI item
+function removeKpiItem(sectionIndex, itemIndex) {
+    const container = document.getElementById(`kpi-items-container-${sectionIndex}`);
+    const items = Array.from(container.querySelectorAll('.input-group'));
+    
+    // Remove the specified item
+    if (itemIndex < items.length) {
+        items[itemIndex].remove();
+        
+        // Renumber remaining items
+        const remainingItems = container.querySelectorAll('.input-group');
+        remainingItems.forEach((item, idx) => {
+            // Update input ID
+            const input = item.querySelector('input');
+            if (input) {
+                input.id = `kpi-item-${sectionIndex}-${idx}`;
+            }
+            
+            // Update button onclick
+            const button = item.querySelector('button');
+            if (button) {
+                button.setAttribute('onclick', `removeKpiItem(${sectionIndex}, ${idx})`);
+            }
+        });
+    }
+}
