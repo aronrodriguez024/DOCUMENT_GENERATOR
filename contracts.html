@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contract Generator</title>
+    <title>Document Automation</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/document_generator/css/contracts.css">
-    <link rel="icon" type="image/x-icon" href="assets/images/weblogo.png">
+    <link rel="icon" type="image/x-icon" href="/document_generator/assets/images/icon.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 
@@ -21,21 +21,15 @@
             </button>
             
             <!-- Logo -->
-            <img id="companyLogo" src="/document_generator/assets/images/weblogo.png" alt="Logo" style="height: 50px; width: auto; margin: 0 10px; padding: 0; cursor:pointer;" onclick="location.reload();" draggable="false">
+            <img id="companyLogo" src="/document_generator/assets/images/icon.png" alt="Logo" style="height: 38px; width: auto; margin: 0 10px; padding: 0; cursor:pointer;" onclick="location.reload();" draggable="false">
 
             <!-- Desktop menu (moved to left side beside logo) -->
             <ul class="nav d-none d-md-flex align-items-center ms-md-1 gap-1">
                 <li class="nav-item">
-                    <a class="nav-link ps-4" href="#">About</a>
+                    <a class="nav-link ps-4" href="about.html">About</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle ps-4" href="#" id="contractDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Contract
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="contractDropdown">
-                        <li><a class="dropdown-item" href="contracts.html">Placeholder Link 1</a></li>
-                        <!-- Add more contract submenu items here -->
-                    </ul>
+                <li class="nav-item">
+                    <a class="nav-link ps-4" href="contracts.html">Contract</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle ps-4" href="#" id="certDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -94,14 +88,14 @@
         <!-- Logo section for mobile -->
         <div class="sidebar-header d-md-none">
             <div class="d-flex align-items-left justify-content-between p-3">
-                <span class="navbar-brand mb-0 h5">Contract Generator</span>
+                <span class="navbar-brand mb-0 h5">Document Automation</span>
                 <button type="button" class="btn-close" id="sidebarClose" aria-label="Close sidebar"></button>
             </div>
         </div>
         <div class="pt-3">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link ps-4" href="#">About</a>
+                    <a class="nav-link ps-4" href="about.html">About</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link ps-4" data-bs-toggle="collapse" href="#sidebarContractMenu" role="button" aria-expanded="false" aria-controls="sidebarContractMenu">
@@ -162,7 +156,7 @@
                         <div class="row">
                             <!-- Left side illustration column -->
                             <div class="col-md-4 mb-3 text-center">
-                                <img src="/document_generator/assets/images/weblogo.png" alt="Contract Illustration" class="img-fluid mb-3" style="max-height: 246px;" draggable="false">
+                                <img src="/document_generator/assets/images/weblogo.png" alt="Program Image" class="img-fluid mb-3" style="max-height: 246px;" draggable="false">
                                 
                                 <!-- Signatory Information -->
                                 <div class="text-start">
@@ -228,7 +222,7 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="client" class="form-label">Client <span class="text-danger">*</span></label>
+                                            <label for="client" class="form-label">Account/Client <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" id="client" style="text-transform: capitalize;" required>
                                         </div>
                                     </div>
@@ -247,13 +241,17 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-6 mb-3">
+                                            <div class="col-md-4 mb-3">
                                                 <label for="salary" class="form-label">Salary <span class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" id="salary" step="0.01" placeholder="0.00" required>
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="employee-id" class="form-label">Employee ID <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="employee-id" maxlength="17" placeholder="Up to 17 characters" required>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="salary" class="form-label">Allowance</label>
+                                                <input type="number" class="form-control" id="salary" step="0.01" placeholder="0.00">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="employee-id" class="form-label">Employee ID No.<span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="employee-id" maxlength="17" required>
                                             </div>
                                         </div>
 
@@ -408,7 +406,7 @@
                             <button class="nav-link" id="acknowledgements-tab" data-bs-toggle="tab" data-bs-target="#acknowledgements-content" type="button" role="tab" aria-controls="acknowledgements-content" aria-selected="false">Acknowledgements</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="kpi-tab" data-bs-toggle="tab" data-bs-target="#kpi-content" type="button" role="tab" aria-controls="kpi-content" aria-selected="false">KPI Sections</button>
+                            <button class="nav-link" id="kpi-tab" data-bs-toggle="tab" data-bs-target="#kpi-content" type="button" role="tab" aria-controls="kpi-content" aria-selected="false">Annex Sections</button>
                         </li>
                     </ul>
                     
@@ -755,8 +753,9 @@
                 iconElement.className = `bi ${iconClass} fs-1`;
             }
             
-            // Initialize weather (updates once when page loads)
+            // Initialize weather
             getWeatherData();
+            setInterval(getWeatherData, 300000);
         });
     </script>
 </body>
