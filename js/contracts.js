@@ -82,7 +82,7 @@ function collectFormData() {
 function generateContractData(formData) {
   const sections = [
     {
-      title: "Probationary Period",
+      title: "Employment Status",
       content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
       useMarkdown: true,
     },
@@ -694,7 +694,14 @@ async function generateContractPDF(formData, contractData) {
     addText("Sir/Ma'am;", margin, yPos, {
       fontSize: 9.5,
     });
-    yPos += lineHeight * 1.4; // Reduced from 1.8
+    yPos += lineHeight * 1.8;
+
+    // Add "Introduction" title before opening paragraph
+    addText("Introduction", margin, yPos, {
+      fontSize: 10, // Match other section titles
+      fontStyle: "bold",
+    });
+    yPos += lineHeight + 2;
 
     // Opening paragraph
     const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}.**`;
@@ -828,7 +835,7 @@ async function generateContractPDF(formData, contractData) {
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight * 1.6; // Reduced from 2
+    yPos += lineHeight * 2; // Reduced from 2
 
     contractData.acknowledgements.forEach((ack) => {
       checkPageBreak(30); // Reduced from 40
@@ -1021,10 +1028,11 @@ document
 
     try {
       const formData = collectFormData();
-      const fileName = `${formData.name.replace(
-        /\s/g,
-        "_"
-      )}_Employment_Contract.pdf`;
+      const fileName = `${formData.name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join('_')
+      }_Employment_Contract.pdf`;
 
       // If we have already generated the PDF during preview, use that
       if (window.generatedPdf) {
@@ -1439,7 +1447,7 @@ function populateContractEditor(contractData) {
         kpiEditor.className = 'card mb-3';
         kpiEditor.innerHTML = `
             <div class="card-header bg-light">
-                <h6 class="mb-0">KPI Section: ${section.title}</h6>
+                <h6 class="mb-0">Annex Section: ${section.title}</h6>
             </div>
             <div class="card-body">
                 <div class="mb-3">
@@ -1938,11 +1946,12 @@ function showAlert(message, type = 'success') {
     alertDiv.setAttribute('role', 'alert');
     alertDiv.style.position = 'fixed';
     alertDiv.style.top = '80px';
-    alertDiv.style.left = '50%';
+    alertDiv.style.left = '50vw';
     alertDiv.style.transform = 'translateX(-50%)';
     alertDiv.style.zIndex = '1030';
     alertDiv.style.minWidth = '300px';
     alertDiv.style.maxWidth = '500px';
+    alertDiv.style.transition = 'opacity 0.7s';
     alertDiv.innerHTML = `
         <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2"></i>
         ${message}
@@ -1952,17 +1961,20 @@ function showAlert(message, type = 'success') {
     // Add to body
     document.body.appendChild(alertDiv);
 
-    // Auto dismiss after 5 seconds
+    // Auto dismiss after 5 seconds with fade out
     setTimeout(() => {
         if (alertDiv && alertDiv.parentElement) {
-            const bsAlert = bootstrap.Alert.getInstance(alertDiv);
-            if (bsAlert) {
-                bsAlert.close();
-            } else {
-                alertDiv.remove();
-            }
+            alertDiv.style.opacity = '0';
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getInstance(alertDiv);
+                if (bsAlert) {
+                    bsAlert.close();
+                } else {
+                    alertDiv.remove();
+                }
+            }, 700); // Match transition duration
         }
-    }, 5000);
+    }, 3000);
 }
 
 // Function to add a new KPI item
