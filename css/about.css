@@ -1,0 +1,180 @@
+.sidebar {
+    position: fixed;
+    top: 56px; 
+    left: 0;
+    width: 260px; /* Width of col-md-2 */
+    height: calc(100vh - 56px);
+    overflow-y: hidden;
+    z-index: 100;
+    transition: transform 0.3s ease-in-out;
+}
+
+.main-content {
+
+}
+
+h1 {
+    font-size: 24px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+h4 {
+    font-size: 16px;
+}
+
+h5 {
+    font-size: 14px;
+}
+
+h6 {
+    font-size: 12px;
+}
+
+label {
+    font-size: 12px;
+}
+
+/* Form element size adjustments */
+.form-control, .form-select {
+    font-size: 12px;
+    padding: 0.25rem 0.5rem;
+    height: auto;
+}
+
+.input-group-text {
+    font-size: 12px;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn {
+    font-size: 12px;
+    padding: 0.375rem 0.75rem;
+}
+
+.btn-sm {
+    font-size: 11px;
+    padding: 0.25rem 0.5rem;
+}
+
+.form-check-label {
+    font-size: 12px;
+}
+
+.form-check-input {
+    margin-top: 0.125rem;
+}
+
+.card-header h3 {
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
+.text-muted {
+    font-size: 10px;
+}
+
+/* Reduce spacing between form elements */
+.mb-3 {
+    margin-bottom: 0.5rem !important; /* Reduced from 1rem */
+}
+
+.row {
+    margin-bottom: 0.25rem; /* Reduced from 0.5rem */
+}
+
+/* Adjust modal elements */
+.modal-title {
+    font-size: 16px;
+}
+
+.modal-body {
+    font-size: 12px;
+}
+
+/* Sidebar header for mobile */
+.sidebar-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+
+
+.navbar-toggler {
+    border: none !important;
+    box-shadow: none !important;
+    background: none !important;
+    margin-right: auto;
+}
+
+
+@media (min-width: 767.98px) {
+    .sidebar .nav-link.active {
+        margin-top: 20px; /* Adjust value as needed */
+        display: block;    /* Ensures padding works as expected */
+    }
+}
+
+/* Mobile sidebar styles */
+@media (max-width: 767.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px; /* Increased width for logo */
+        z-index: 1050;
+        top: 0; /* Remove gap by starting from top */
+        height: 100vh; /* Full height */
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+
+    .nav-link.active {
+        background-color: #e4f3ff;
+    }
+    
+    .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        margin: 20px;
+    }
+}
+
+/* Desktop styles - hide overlay completely */
+@media (min-width: 768px) {
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+@media print {
+    .page-break { page-break-before: always; }
+}
+
+#contractPreviewBody {
+    font-size: 12px; /* Adjust font size if text is too big */
+    line-height: 1.3; /* Adjust line height for better spacing */
+}
