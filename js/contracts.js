@@ -72,6 +72,7 @@ function collectFormData() {
     client,
     employeeId,
     salary,
+    allowance: parseFloat(document.getElementById("allowance").value || 0).toFixed(2),
     signatoryName,
     signatoryPosition,
     signatureImageDataUrl,
@@ -88,7 +89,10 @@ function generateContractData(formData) {
     },
     {
       title: "Compensation and Benefits",
-      content: `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
+      content:
+        parseFloat(formData.allowance) > 0
+          ? `Your salary shall be **Php${formData.salary}** and allowance of **Php${formData.allowance}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`
+          : `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
       useMarkdown: true,
     },
     {
@@ -1249,11 +1253,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const endDate = new Date(startDate);
             endDate.setMonth(endDate.getMonth() + 6);
             endDate.setDate(endDate.getDate() - 1);
-            endDateInput.value = endDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: '2-digit',
-            });
+            endDateInput.value = formatDateMMDDYYYY(endDate);
         } else {
             endDateInput.value = '';
         }
