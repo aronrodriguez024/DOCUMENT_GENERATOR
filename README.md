@@ -49,6 +49,7 @@ This project is under the company of Regcris, Tmarks and Prestige.
 ## 🗂️ Project Structure:
 
 The project is organized with a clear separation of concerns.
+```
 /
 ├── contracts.html              # Main HTML file for the dashboard
 ├── css/
@@ -59,6 +60,7 @@ The project is organized with a clear separation of concerns.
 │   ├── images/                 # Logos and favicons
 │   └── fonts/                  # Custom fonts for PDF generation
 └── README.md                   # Project documentation
+```
 ---
 
 ## 🚀 Getting Started:
