@@ -19,6 +19,7 @@ function collectFormData() {
   const companyAddress = companyAddressMap[companyKey];
   const employmentTypeSelect = document.getElementById("employment-type");
   const employmentType = employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
+  const employmentTypeValue = employmentTypeSelect.value;
   const name = document.getElementById("name").value;
   const address = document.getElementById("address").value;
   const email = document.getElementById("email").value;
@@ -39,10 +40,18 @@ function collectFormData() {
     day: "2-digit",
   });
 
-  // Calculate end date (6 months - 1 day)
-  const endDate = new Date(startDate);
-  endDate.setMonth(endDate.getMonth() + 6);
-  endDate.setDate(endDate.getDate() - 1);
+  // Calculate or get end date based on employment type
+  let endDate;
+  if (employmentTypeValue === 'RELIEVER' || employmentTypeValue === 'PROJECT') {
+    // Use the manually entered end date
+    endDate = new Date(document.getElementById("end-date").value);
+  } else {
+    // Calculate end date (6 months - 1 day)
+    endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 6);
+    endDate.setDate(endDate.getDate() - 1);
+  }
+  
   const formattedEndDate = endDate.toLocaleString("en-US", {
     year: "numeric",
     month: "long",
@@ -81,26 +90,43 @@ function collectFormData() {
 
 // Shared function to generate contract sections data
 function generateContractData(formData) {
-  const sections = [
-    {
-      title: "Employment Status",
-      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
-      useMarkdown: true,
-    },
-    {
-      title: "Compensation and Benefits",
-      content:
-        parseFloat(formData.allowance) > 0
-          ? `Your salary shall be **Php${formData.salary}** and allowance of **Php${formData.allowance}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`
-          : `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
-      useMarkdown: true,
-    },
-    {
-      title: "Work Assignment and Location",
-      content: `Your initial work assignment will be at ________________________________. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.`,
+  // Determine duties based on position level
+  const positionLevel = document.getElementById('position-level').value;
+  
+  let dutiesSection;
+  
+  if (positionLevel === 'SUPERVISORY') {
+    dutiesSection = {
+      title: "Duties and Responsibilities",
+      content: "Your primary task shall include, but are not limited to, the following:",
+      list: [
+        "Review daily plans and objectives.",
+        "Monitor Merchandiser's attendance, grooming, and compliance:",
+        "Conduct store checks:",
+        "Prepare a weekly documentary report of off-take and inventory.",
+        "Negotiate additional product facing.",
+        "Provide daily updates on project status, including manning, issues, concerns, promotional activities, and feedback.",
+        "Observe established company rules, procedures, and code of conduct in performing official duties.",
+        "Regularly check and update manning, coordinate with HR and Recruitment Team on absences, AWOL, incidents report, and manpower needs. Assist in searching, deployment, introductions, and on-site orientations.",
+        "Perform other related tasks or duties inherent to the position as may be assigned from time to time.",
+      ],
+      subList: {
+        1: [
+          "Verify logbook/time card and merchandising materials kit",
+          "Ensure regular reporting and adherence to the schedule",
+          "Detect and report any irregularities or fraud",
+        ],
+        2: [
+          "Assess primary and secondary shelf display for stock levels, conditions, and product facing",
+          "Ensure compliance with generic merchandising standards",
+          "Monitor competitive activities",
+        ],
+      },
       useMarkdown: false,
-    },
-    {
+    };
+  } else {
+    // Default duties for RANK_AND_FILE
+    dutiesSection = {
       title: "Duties and Responsibilities",
       content: "Your primary task shall include, but are not limited to, the following:",
       list: [
@@ -122,7 +148,29 @@ function generateContractData(formData) {
         ],
       },
       useMarkdown: false,
+    };
+  }
+
+  const sections = [
+    {
+      title: "Employment Status",
+      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
+      useMarkdown: true,
     },
+    {
+      title: "Compensation and Benefits",
+      content:
+        parseFloat(formData.allowance) > 0
+          ? `Your salary shall be **P${formData.salary}** and allowance of **P${formData.allowance}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`
+          : `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
+      useMarkdown: true,
+    },
+    {
+      title: "Work Assignment and Location",
+      content: `Your initial work assignment will be at ________________________________. However, the company reserves the right to reassign you to other locations as needed, or as requested by the client. You may also be required to travel between locations depending on operational requirements.`,
+      useMarkdown: false,
+    },
+    dutiesSection, // Insert the appropriate duties section here
     {
       title: "Reporting Line",
       content: "You shall report directly to the company's designated coordinators, supervisors or officers. All work instructions and guidance shall come from them. They will orient you on your work schedule, attendance monitoring, performance evaluation, compliance, and other job-related matters.",
@@ -1852,16 +1900,16 @@ function saveContractEditorChanges() {
                         // Check for sub-items
                         const subContainer = document.getElementById(`sub-list-container-${index}-${itemIndex}`);
                         if (subContainer) {
-                            const subInputs = subContainer.querySelectorAll('input');
-                            const subItems = [];
-                            subInputs.forEach(subInput => {
-                                if (subInput.value.trim()) {
-                                    subItems.push(subInput.value);
-                                }
-                            });
-                            if (subItems.length > 0) {
-                                subListItems[itemIndex] = subItems;
-                            }
+                          const subInputs = subContainer.querySelectorAll('input');
+                          const subItems = [];
+                          subInputs.forEach(subInput => {
+                              if (subInput.value.trim()) {
+                                  subItems.push(subInput.value);
+                              }
+                          });
+                          if (subItems.length > 0) {
+                              subListItems[itemIndex] = subItems;
+                          }
                         }
                     }
                 });
@@ -2020,3 +2068,65 @@ function removeKpiItem(sectionIndex, itemIndex) {
         });
     }
 }
+
+// Reset custom contract data when key form fields change
+document.addEventListener('DOMContentLoaded', function() {
+    const employmentType = document.getElementById('employment-type');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    const positionLevel = document.getElementById('position-level');
+    const allowance = document.getElementById('allowance');
+
+    function updateDependentFields() {
+        // Handle position level and allowance
+        if (employmentType.value === 'RELIEVER' || employmentType.value === 'PROJECT') {
+            positionLevel.disabled = true;
+            positionLevel.value = '';
+            allowance.disabled = true;
+            allowance.value = '';
+        } else {
+            positionLevel.disabled = false;
+            updateAllowanceState();
+        }
+
+        // Handle end date field
+        if (employmentType.value === 'RELIEVER' || employmentType.value === 'PROJECT') {
+            endDateInput.readOnly = false;
+        } else {
+            endDateInput.readOnly = true;
+            updateEndDate(); // Calculate end date automatically
+        }
+    }
+
+    function updateEndDate() {
+        const startDate = new Date(startDateInput.value);
+        if (!isNaN(startDate) && endDateInput.readOnly) {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 6);
+            endDate.setDate(endDate.getDate() - 1);
+            
+            // Format as YYYY-MM-DD for date input
+            const year = endDate.getFullYear();
+            const month = String(endDate.getMonth() + 1).padStart(2, '0');
+            const day = String(endDate.getDate()).padStart(2, '0');
+            endDateInput.value = `${year}-${month}-${day}`;
+        }
+    }
+
+    function updateAllowanceState() {
+        if (positionLevel.value === 'SUPERVISORY') {
+            allowance.disabled = false;
+        } else {
+            allowance.disabled = true;
+            allowance.value = '';
+        }
+    }
+
+    // Add event listeners
+    employmentType.addEventListener('change', updateDependentFields);
+    startDateInput.addEventListener('input', updateEndDate);
+    positionLevel.addEventListener('change', updateAllowanceState);
+
+    // Initialize fields on page load
+    updateDependentFields();
+});
