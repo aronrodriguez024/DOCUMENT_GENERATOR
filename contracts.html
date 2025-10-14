@@ -216,7 +216,7 @@
                                         
                                         <div class="mb-3">
                                             <label for="end-date" class="form-label">End Date</label>
-                                            <input type="text" class="form-control" id="end-date" readonly>
+                                            <input type="date" class="form-control" id="end-date" readonly>
                                         </div>
 
                                         <div class="row">
@@ -447,6 +447,23 @@
     <script src="/document_generator/js/contracts.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Disabling position-level if employment type is Reliever or Project
+            const employmentType = document.getElementById('employment-type');
+            const positionLevel = document.getElementById('position-level');
+
+            function updatePositionLevelState() {
+                if (employmentType.value === 'RELIEVER' || employmentType.value === 'PROJECT') {
+                    positionLevel.disabled = true;
+                    positionLevel.value = '';
+                } else {
+                    positionLevel.disabled = false;
+                }
+            }
+
+            employmentType.addEventListener('change', updatePositionLevelState);
+            
+            updatePositionLevelState();
+
             // E-signature close button
             const signatureInput = document.getElementById('signatureInput');
             const removeSignatureBtn = document.getElementById('removeSignatureBtn');
