@@ -29,6 +29,8 @@ function collectFormData() {
   const client = document.getElementById("client").value;
   const employeeId = document.getElementById("employee-id").value;
   const salary = parseFloat(document.getElementById("salary").value).toFixed(2);
+  const signatoryName = document.getElementById("signatory-name").value;
+  const signatoryPosition = document.getElementById("signatory-position").value;
 
   // Format start date
   const formattedStartDate = startDate.toLocaleString("en-US", {
@@ -48,10 +50,10 @@ function collectFormData() {
   });
 
   // Format phone number
-  const formattedPhone = `0${phone.substring(0, 3)}-${phone.substring(
+  const formattedPhone = `0${phone.substring(0, 3)}.${phone.substring(
     3,
     6
-  )}-${phone.substring(6, 10)}`;
+  )}.${phone.substring(6, 10)}`;
 
   return {
     companyName,
@@ -70,6 +72,10 @@ function collectFormData() {
     client,
     employeeId,
     salary,
+    allowance: parseFloat(document.getElementById("allowance").value || 0).toFixed(2),
+    signatoryName,
+    signatoryPosition,
+    signatureImageDataUrl,
   };
 }
 
@@ -77,13 +83,16 @@ function collectFormData() {
 function generateContractData(formData) {
   const sections = [
     {
-      title: "Probationary Period",
-      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}**. Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
+      title: "Employment Status",
+      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
       useMarkdown: true,
     },
     {
       title: "Compensation and Benefits",
-      content: `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
+      content:
+        parseFloat(formData.allowance) > 0
+          ? `Your salary shall be **Php${formData.salary}** and allowance of **Php${formData.allowance}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`
+          : `Your salary shall be **P${formData.salary}** per day, payable bi-monthly. This amount may be adjusted following applicable wage orders. You will also receive all standard legal benefits as mandated by Philippine labor laws and other social legislation.`,
       useMarkdown: true,
     },
     {
@@ -170,7 +179,7 @@ function generateContractData(formData) {
       title: "ATTENDANCE (30%)",
       items: [
         "Regular na pumapasok at nasa tamang oras.",
-        "Nagpapaalam ng mas maaga kung may planong umabsent. Tinatapos ang lahat ng gawain lalo na kung nagbabalak umabsent.",
+        "Nagpapaalam nang mas maaga kung may planong umabsent. Tinatapos ang lahat ng gawain lalo na kung nagbabalak umabsent.",
       ],
     },
     {
@@ -444,7 +453,7 @@ function generatePreviewHTML(formData, contractData) {
       <p class="justified closing-statement">We welcome you into our organization and trust that your association with us will be mutually beneficial!</p>
 
       <div class="signature-block">
-        <p><strong>FERNANDO B. PANGANIBAN</strong><br>HR & Admin Manager</p>
+        <p><strong>${formData.signatoryName}</strong><br>${formData.signatoryPosition}</p>
       </div>
 
       <div class="acknowledgement-heading">
@@ -473,14 +482,15 @@ async function generateContractPDF(formData, contractData) {
     const pdf = new window.jspdf.jsPDF({
       orientation: "portrait",
       unit: "pt",
-      format: [612, 936],
+      format: "letter",
+      // format: [612, 936], For legal size (8.5 x 14 inches)
     });
 
     // PDF dimensions and margins
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 40;
-    const lineHeight = 13;
+    const lineHeight = 11; // Reduced from 13 to 11
     let yPos = margin;
 
     // Load font
@@ -587,7 +597,7 @@ async function generateContractPDF(formData, contractData) {
       return y + lines.length * lineHeight;
     }
 
-    function checkPageBreak(requiredSpace = 45) {
+    function checkPageBreak(requiredSpace = 35) { // Reduced from 45 to 35
       if (yPos + requiredSpace > pageHeight - margin) {
         pdf.addPage();
         yPos = margin;
@@ -636,7 +646,7 @@ async function generateContractPDF(formData, contractData) {
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight + 5;
+    yPos += lineHeight + 3; // Reduced spacing
 
     addText(
       formData.companyAddress,
@@ -647,7 +657,7 @@ async function generateContractPDF(formData, contractData) {
         align: "center",
       }
     );
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 2; // Reduced from 1.8
 
     addText(
       `${formData.employmentType.toUpperCase()} EMPLOYMENT CONTRACT`,
@@ -659,14 +669,14 @@ async function generateContractPDF(formData, contractData) {
         align: "center",
       }
     );
-    yPos += lineHeight * 2.6;
+    yPos += lineHeight * 2.2; // Reduced from 2.6
 
     // Employee info
     addText(formData.name.toUpperCase(), margin, yPos, {
       fontSize: 10,
       fontStyle: "bold",
     });
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1; // Reduced from 0.9
 
     yPos = addJustifiedText(
       pdf,
@@ -676,13 +686,13 @@ async function generateContractPDF(formData, contractData) {
       pageWidth - margin * 2,
       { fontSize: 9.5 }
     );
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1; // Reduced from 0.9
 
     addText(formData.email, margin, yPos, { fontSize: 9.5 });
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 1; // Reduced from 0.9
 
     addText(formData.formattedPhone, margin, yPos, { fontSize: 9.5 });
-    yPos += lineHeight * 2.3;
+    yPos += lineHeight * 1.8; // Reduced from 2.3
 
     // Greeting
     addText("Sir/Ma'am;", margin, yPos, {
@@ -690,8 +700,15 @@ async function generateContractPDF(formData, contractData) {
     });
     yPos += lineHeight * 1.8;
 
+    // Add "Introduction" title before opening paragraph
+    addText("Introduction", margin, yPos, {
+      fontSize: 10, // Match other section titles
+      fontStyle: "bold",
+    });
+    yPos += lineHeight + 2;
+
     // Opening paragraph
-    const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}**,`;
+    const openingText = `We are pleased to inform you that you are being hired as ${formData.employmentType} **${formData.position.toUpperCase()}** effective **${formData.formattedStartDate}** subject to the following terms and conditions, you will be assigned to one of our client the **${formData.client.toUpperCase()}** and your Employee I.D. Number is **${formData.employeeId.toUpperCase()}.**`;
 
     // Use renderStyledText instead of addJustifiedText for markdown parsing
     yPos = renderStyledText(
@@ -702,17 +719,17 @@ async function generateContractPDF(formData, contractData) {
       pageWidth - margin * 2,
       { fontSize: 9.5, fontFamily: fontFamily }
     );
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 0.7; // Reduced from 0.9
 
     // Add sections
     contractData.sections.forEach((section) => {
-      checkPageBreak(45);
+      checkPageBreak(35); // Reduced from 45
 
       addText(section.title, margin, yPos, {
         fontSize: 10,
         fontStyle: "bold",
       });
-      yPos += lineHeight + 4;
+      yPos += lineHeight + 2; // Reduced spacing
 
       // Check if section should use markdown rendering
       if (section.useMarkdown) {
@@ -722,7 +739,7 @@ async function generateContractPDF(formData, contractData) {
           margin,
           yPos,
           pageWidth - margin * 2,
-          { fontSize: 9.5, fontFamily: fontFamily } // Add fontFamily to options
+          { fontSize: 9.5, fontFamily: fontFamily }
         );
       } else {
         yPos = addJustifiedText(
@@ -734,11 +751,11 @@ async function generateContractPDF(formData, contractData) {
           { fontSize: 9.5 }
         );
       }
-      yPos += lineHeight * 0.9;
+      yPos += lineHeight * 0.1; // Reduced from 0.2
 
       if (section.list) {
         section.list.forEach((item, index) => {
-          checkPageBreak(28);
+          checkPageBreak(22); // Reduced from 28
           let listText = `${index + 1}. ${item}`;
           yPos = addJustifiedText(
             pdf,
@@ -750,8 +767,10 @@ async function generateContractPDF(formData, contractData) {
           );
 
           if (section.subList && section.subList[index]) {
+            // Add extra spacing before the sub-list
+            yPos += lineHeight * 0.2; // Reduced from 0.3
             section.subList[index].forEach((subItem, subIndex) => {
-              checkPageBreak(23);
+              checkPageBreak(18); // Reduced from 23
               const subLetter = String.fromCharCode(97 + subIndex);
               yPos = addJustifiedText(
                 pdf,
@@ -761,19 +780,19 @@ async function generateContractPDF(formData, contractData) {
                 pageWidth - margin * 2 - 35,
                 { fontSize: 9.5 }
               );
-              yPos += lineHeight * 0.25;
+              yPos += lineHeight * 0.15; // Reduced from 0.25
             });
           }
 
-          yPos += lineHeight * 0.4;
+          yPos += lineHeight * 0.3; // Reduced from 0.4
         });
       }
 
-      yPos += lineHeight * 0.9;
+      yPos += lineHeight * 0.7; // Reduced from 0.9
     });
 
     // Closing statement
-    checkPageBreak(35);
+    checkPageBreak(25); // Reduced from 35
     yPos = addJustifiedText(
       pdf,
       "We welcome you into our organization and trust that your association with us will be mutually beneficial!",
@@ -782,31 +801,48 @@ async function generateContractPDF(formData, contractData) {
       pageWidth - margin * 2,
       { fontSize: 9.5 }
     );
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 1.4; // Reduced from 1.8
 
-    yPos += lineHeight * 2;
-    // Signature
-    addText("FERNANDO B. PANGANIBAN", margin + 330, yPos, {
+    yPos += lineHeight * 4; // Reduced from 2
+
+    // --- Place e-signature image above signatory's name ---
+    const signatoryBlockX = margin + 340;
+    const signatoryBlockY = yPos; // Save current yPos
+
+    // Draw e-signature image above signatory name, but do NOT adjust yPos
+    if (formData.signatureImageDataUrl) {
+      const imgWidth = 120; // px
+      const imgHeight = 40; // px
+      const imgX = signatoryBlockX;
+      const imgY = signatoryBlockY - imgHeight - 8; // 8pt spacing above name
+
+      pdf.addImage(formData.signatureImageDataUrl, 'PNG', imgX, imgY, imgWidth, imgHeight);
+    }
+
+    // Signatory name and position (always at signatoryBlockY)
+    let ySignatory = signatoryBlockY;
+    ySignatory = addWrappedText(formData.signatoryName, signatoryBlockX, ySignatory, 200, {
       fontSize: 9.5,
       fontStyle: "bold",
+      align: "left",
     });
-    yPos += lineHeight;
-    addText("HR & Admin Manager", margin + 370, yPos, {
+    ySignatory = addWrappedText(formData.signatoryPosition, signatoryBlockX, ySignatory, 200, {
       fontSize: 9.5,
+      align: "left",
     });
-    yPos += lineHeight * 1.8;
+    yPos += lineHeight * 5; // spacing after block
 
     // Acknowledgement section
-    checkPageBreak(75);
+    checkPageBreak(60); // Reduced from 75
     addText("ACKNOWLEDGEMENT, CONSENT AND UNDERTAKING", 0, yPos, {
       fontSize: 10,
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight * 1.3;
+    yPos += lineHeight * 2; // Reduced from 2
 
     contractData.acknowledgements.forEach((ack) => {
-      checkPageBreak(40);
+      checkPageBreak(30); // Reduced from 40
       yPos = addJustifiedText(
         pdf,
         ack,
@@ -815,67 +851,71 @@ async function generateContractPDF(formData, contractData) {
         pageWidth - margin * 2,
         { fontSize: 9.5 }
       );
-      yPos += lineHeight * 1.1;
+      yPos += lineHeight * 0.9; // Reduced from 1.1
     });
 
     // Employee signature
-    yPos += lineHeight * 0.9;
+    yPos += lineHeight * 3.5; // Reduced from 1.9
     const signatureMaxWidth = 200;
     const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
     signatureLines.forEach((line, i) => {
-      addText(line, pageWidth - margin - signatureMaxWidth, yPos + i * lineHeight, {
+      addText(line, pageWidth - margin - signatureMaxWidth + 10, yPos + i * lineHeight, {
         fontSize: 9.5,
         fontStyle: "bold",
-        align: "right",
+        align: "left",
       });
     });
     yPos += lineHeight * signatureLines.length;
 
     // Force new page for Annex A
     pdf.addPage();
-    yPos = margin;
 
-    yPos += lineHeight * 3;
+    // Calculate vertical center position
+    const annexAHeight = calculateAnnexAHeight(contractData, lineHeight, margin, pageWidth);
+    const availableHeight = pageHeight - (margin * 2);
+    const startY = margin + ((availableHeight - annexAHeight) / 2);
+
+    // Use the centered starting position
+    yPos = Math.max(margin, startY); // Ensure we don't go above the margin
 
     addText('ANNEX "A"', 0, yPos, {
-      fontSize: 16,
+      fontSize: 10,
       fontStyle: "bold",
       align: "right",
     });
-    yPos += lineHeight * 3.3;
+    yPos += lineHeight * 2.5;
 
     addText("KEY PERFORMANCE FACTORS AND EXPECTATION PARAMETERS", 0, yPos, {
-      fontSize: 14,
+      fontSize: 10,
       fontStyle: "bold",
       align: "center",
     });
-    yPos += lineHeight * 1.2;
+    yPos += lineHeight;
 
     addText("(Upang magsilbing gabay sa pagtupad ng tungkulin)", 0, yPos, {
-      fontSize: 12,
+      fontSize: 9.5,
       align: "center",
     });
-    yPos += lineHeight * 4.3;
+    yPos += lineHeight * 2.5;
 
     // KPI sections
     contractData.kpiSections.forEach((section, sectionIndex) => {
       const pageBreakThreshold =
-        sectionIndex === contractData.kpiSections.length - 1 ? 110 : 45;
+        sectionIndex === contractData.kpiSections.length - 1 ? 90 : 35;
 
       checkPageBreak(pageBreakThreshold);
 
       addText(section.title, margin, yPos, {
-        fontSize: 12,
+        fontSize: 10,
         fontStyle: "bold",
       });
-      yPos += lineHeight + 4;
+      yPos += lineHeight + 1;
 
       section.items.forEach((item, itemIndex) => {
         const itemPageBreakThreshold =
           sectionIndex === contractData.kpiSections.length - 1 &&
           itemIndex === section.items.length - 1
-            ? 75
-            : 28;
+            ? 60 : 22;
 
         checkPageBreak(itemPageBreakThreshold);
 
@@ -885,12 +925,12 @@ async function generateContractPDF(formData, contractData) {
           margin + 15,
           yPos,
           pageWidth - margin * 2 - 15,
-          { fontSize: 11 }
+          { fontSize: 9.5 }
         );
-        yPos += lineHeight * 0.35;
+        yPos += lineHeight * 0.15;
       });
 
-      yPos += lineHeight * 0.9;
+      yPos += lineHeight * 0.4;
     });
 
     return pdf;
@@ -898,6 +938,39 @@ async function generateContractPDF(formData, contractData) {
     console.error("PDF generation error:", error);
     throw error;
   }
+}
+
+// Helper function to calculate Annex A content height
+function calculateAnnexAHeight(contractData, lineHeight, margin, pageWidth) {
+  let totalHeight = 0;
+  
+  // ANNEX "A" title
+  totalHeight += lineHeight * 2.5;
+  
+  // Main heading
+  totalHeight += lineHeight;
+  
+  // Subtitle
+  totalHeight += lineHeight * 2.5;
+  
+  // Calculate height for each KPI section
+  contractData.kpiSections.forEach((section) => {
+    // Section title
+    totalHeight += lineHeight + 1;
+    
+    // Each item in the section
+    section.items.forEach((item) => {
+      // Estimate lines needed for each item (approximate calculation)
+      const maxWidth = pageWidth - margin * 2 - 15;
+      const estimatedLines = Math.ceil(item.length / (maxWidth / 6)); // Rough estimate
+      totalHeight += (estimatedLines * lineHeight) + (lineHeight * 0.15);
+    });
+    
+    // Section spacing
+    totalHeight += lineHeight * 0.4;
+  });
+  
+  return totalHeight;
 }
 
 // Preview button event listener (modified)
@@ -909,17 +982,22 @@ document
       loader.classList.remove("d-none");
       this.disabled = true;
 
+      // Wait for signature image to be loaded
+      await signatureImageLoaded;
+
       const formData = collectFormData();
-      const contractData = generateContractData(formData);
+      // Use custom contract data if available, otherwise generate default
+      const contractData = customContractData || generateContractData(formData);
 
       // Generate the PDF and store it for later download
       const pdf = await generateContractPDF(formData, contractData);
 
-      // Convert the PDF to a data URL for preview
-      const pdfData = pdf.output("datauristring");
+      // Convert the PDF to a Blob for preview
+      const pdfBlob = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
 
       // Create an iframe to display the PDF
-      const previewFrame = `<iframe src="${pdfData}" width="100%" height="100%" style="border: none; min-height: 70vh; max-height: 80vh;" class="responsive-pdf-iframe"></iframe>`;
+      const previewFrame = `<iframe src="${pdfUrl}" width="100%" height="100%" style="border: none; min-height: 70vh; max-height: 80vh;" class="responsive-pdf-iframe"></iframe>`;
 
       // Update the preview modal with the iframe
       document.getElementById("contractPreviewBody").innerHTML = previewFrame;
@@ -954,17 +1032,18 @@ document
 
     try {
       const formData = collectFormData();
-      const fileName = `${formData.name.replace(
-        /\s/g,
-        "_"
-      )}_Employment_Contract.pdf`;
+      const fileName = `${formData.name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join('_')
+      }_Employment_Contract.pdf`;
 
       // If we have already generated the PDF during preview, use that
       if (window.generatedPdf) {
         window.generatedPdf.save(fileName);
       } else {
-        // Otherwise generate a new PDF (fallback)
-        const contractData = generateContractData(formData);
+        // Use custom contract data if available
+        const contractData = customContractData || generateContractData(formData);
         generateContractPDF(formData, contractData).then((pdf) => {
           pdf.save(fileName);
         });
@@ -1061,7 +1140,7 @@ function renderStyledText(pdf, text, x, y, maxWidth, options = {}) {
   
   const fontSize = options.fontSize || 9.5;
   const fontFamily = options.fontFamily || 'helvetica';
-  const lineHeight = 13;
+  const lineHeight = 11; // Reduced from 13 to match the main lineHeight
   let currentY = y;
   
   pdf.setFontSize(fontSize);
@@ -1148,4 +1227,796 @@ function renderStyledText(pdf, text, x, y, maxWidth, options = {}) {
   });
   
   return currentY;
+}
+
+// DOMContentLoaded event listener for initializing form fields
+document.addEventListener('DOMContentLoaded', function () {
+    const companySelect = document.getElementById('company');
+    const startDateInput = document.getElementById('start-date');
+    const companyAddressInput = document.getElementById('company-address');
+    const endDateInput = document.getElementById('end-date');
+
+    function updateReadonlyFields() {
+        const companyKey = companySelect.value;
+        const startDate = new Date(startDateInput.value);
+
+        // Update company address
+        const companyAddressMap = {
+            "trade-marketing": "Room 306 3F CLMC Building, 259 EDSA, Barangay Wack-Wack Greenshills East, Mandaluyong City",
+            "regcris": "2768 Faraday, Makati City, 1234 Metro Manila",
+            "prestige": "3F Lupin Building, 2768 Faraday Street, Barangay San Isidro, Makati City",
+        };
+        companyAddressInput.value = companyAddressMap[companyKey] || '';
+
+        // Calculate and update end date
+        if (!isNaN(startDate)) {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 6);
+            endDate.setDate(endDate.getDate() - 1);
+            endDateInput.value = formatDateMMDDYYYY(endDate);
+        } else {
+            endDateInput.value = '';
+        }
+    }
+
+    // Add event listeners
+    companySelect.addEventListener('change', updateReadonlyFields);
+    startDateInput.addEventListener('input', updateReadonlyFields);
+});
+
+function formatDateMMDDYYYY(date) {
+    if (!(date instanceof Date) || isNaN(date)) return '';
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+
+    function updateEndDate() {
+        const startDate = new Date(startDateInput.value);
+        if (!isNaN(startDate)) {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 6);
+            endDate.setDate(endDate.getDate() - 1);
+            endDateInput.value = formatDateMMDDYYYY(endDate);
+        } else {
+            endDateInput.value = '';
+        }
+    }
+
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('input', updateEndDate);
+    }
+});
+
+let signatureImageDataUrl = null;
+let signatureImageLoaded = Promise.resolve();
+
+document.addEventListener('DOMContentLoaded', function () {
+  const signatureInput = document.getElementById('signatureInput');
+  if (signatureInput) {
+    signatureInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        signatureImageLoaded = new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = async function (evt) {
+            signatureImageDataUrl = await resizeImage(evt.target.result, 400);
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      } else {
+        signatureImageDataUrl = null;
+        signatureImageLoaded = Promise.resolve();
+      }
+    });
+  }
+});
+
+async function resizeImage(dataUrl, maxWidth = 400) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = function () {
+      const scale = Math.min(1, maxWidth / img.width);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.src = dataUrl;
+  });
+}
+
+// Add these variables at the top of your file, after existing variable declarations
+let customContractData = null;
+let originalContractData = null;
+
+// Add this function to handle the Edit button click
+document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('editBtn');
+    if (editBtn) {
+        editBtn.addEventListener('click', function() {
+            openContractEditor();
+        });
+    }
+
+    // Add event listener for Edit button in preview modal
+    const editFromPreviewBtn = document.getElementById('editFromPreviewBtn');
+    if (editFromPreviewBtn) {
+        editFromPreviewBtn.addEventListener('click', function() {
+            // Close the preview modal
+            const previewModal = bootstrap.Modal.getInstance(document.getElementById('contractPreviewModal'));
+            if (previewModal) {
+                previewModal.hide();
+            }
+            
+            // Open the editor modal
+            openContractEditor();
+        });
+    }
+
+    // Initialize the editor save button
+    const saveContractEdits = document.getElementById('saveContractEdits');
+    if (saveContractEdits) {
+        saveContractEdits.addEventListener('click', function() {
+            saveContractEditorChanges();
+        });
+    }
+});
+
+// Function to open the contract editor modal
+function openContractEditor() {
+    // Get the form data
+    const formData = collectFormData();
+    
+    // Generate the default contract data
+    originalContractData = generateContractData(formData);
+    
+    // Use custom data if available, otherwise use original data
+    const contractData = customContractData || originalContractData;
+    
+    // Populate the editor with contract data
+    populateContractEditor(contractData);
+    
+    // Show the modal
+    const editorModal = new bootstrap.Modal(document.getElementById('contractEditorModal'));
+    editorModal.show();
+}
+
+// Function to populate the contract editor with data
+function populateContractEditor(contractData) {
+    // Clear existing content
+    const sectionsContainer = document.getElementById('contractSectionsContainer');
+    const acknowledgementsContainer = document.getElementById('acknowledgementsContainer');
+    const kpiSectionsContainer = document.getElementById('kpiSectionsContainer');
+    
+    sectionsContainer.innerHTML = '';
+    acknowledgementsContainer.innerHTML = '';
+    kpiSectionsContainer.innerHTML = '';
+    
+    // Populate contract sections
+    contractData.sections.forEach((section, index) => {
+        const sectionEditor = document.createElement('div');
+        sectionEditor.className = 'card mb-3';
+        sectionEditor.innerHTML = `
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Section ${index + 1}: ${section.title}</h6>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="useMarkdown-${index}" ${section.useMarkdown ? 'checked' : ''}>
+                    <label class="form-check-label" for="useMarkdown-${index}">Use Markdown</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="section-title-${index}" class="form-label">Title:</label>
+                    <input type="text" class="form-control" id="section-title-${index}" value="${section.title}">
+                </div>
+                <div class="mb-3">
+                    <label for="section-content-${index}" class="form-label">Content:</label>
+                    <textarea class="form-control" id="section-content-${index}" rows="4">${section.content}</textarea>
+                </div>
+                ${section.list ? renderListEditor(section, index) : ''}
+            </div>
+        `;
+        sectionsContainer.appendChild(sectionEditor);
+    });
+    
+    // Populate acknowledgements
+    contractData.acknowledgements.forEach((ack, index) => {
+        const ackEditor = document.createElement('div');
+        ackEditor.className = 'mb-3';
+        ackEditor.innerHTML = `
+            <label for="acknowledgement-${index}" class="form-label">Acknowledgement ${index + 1}:</label>
+            <textarea class="form-control" id="acknowledgement-${index}" rows="4">${ack}</textarea>
+        `;
+        acknowledgementsContainer.appendChild(ackEditor);
+    });
+    
+    // Populate KPI sections
+    contractData.kpiSections.forEach((section, index) => {
+        const kpiEditor = document.createElement('div');
+        kpiEditor.className = 'card mb-3';
+        kpiEditor.innerHTML = `
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Annex Section: ${section.title}</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="kpi-title-${index}" class="form-label">Title:</label>
+                    <input type="text" class="form-control" id="kpi-title-${index}" value="${section.title}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Items:</label>
+                    <div id="kpi-items-container-${index}">
+                        ${renderKpiItems(section.items, index)}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addKpiItem(${index})">
+                        <i class="bi bi-plus-circle"></i> Add Item
+                    </button>
+                </div>
+            </div>
+        `;
+        kpiSectionsContainer.appendChild(kpiEditor);
+    });
+}
+
+// Function to render list editor for a section
+function renderListEditor(section, sectionIndex) {
+    let html = `
+        <div class="mb-3">
+            <label class="form-label">List Items:</label>
+            <div id="list-items-container-${sectionIndex}">
+    `;
+    
+    section.list.forEach((item, itemIndex) => {
+        html += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">${itemIndex + 1}.</span>
+                <input type="text" class="form-control" id="list-item-${sectionIndex}-${itemIndex}" value="${item}">
+                <button class="btn btn-outline-danger" type="button" onclick="removeListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleSubList(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        `;
+        
+        // Add sub-list if available
+        if (section.subList && section.subList[itemIndex]) {
+            html += `<div class="ms-4 mb-2" id="sub-list-container-${sectionIndex}-${itemIndex}">`;
+            section.subList[itemIndex].forEach((subItem, subIndex) => {
+                html += `
+                    <div class="input-group mb-2" data-sub-item="true">
+                        <span class="input-group-text">${String.fromCharCode(97 + subIndex)})</span>
+                        <input type="text" class="form-control" id="sub-item-${sectionIndex}-${itemIndex}-${subIndex}" value="${subItem}">
+                        <button class="btn btn-outline-danger" type="button" onclick="removeSubListItem(${sectionIndex}, ${itemIndex}, ${subIndex})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addSubListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-plus-circle"></i> Add Sub-item
+                </button>
+            </div>`;
+        }
+    });
+    
+    html += `
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addListItem(${sectionIndex})">
+                <i class="bi bi-plus-circle"></i> Add List Item
+            </button>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Function to render KPI items
+function renderKpiItems(items, sectionIndex) {
+    let html = '';
+    items.forEach((item, itemIndex) => {
+        html += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">•</span>
+                <input type="text" class="form-control" id="kpi-item-${sectionIndex}-${itemIndex}" value="${item}">
+                <button class="btn btn-outline-danger" type="button" onclick="removeKpiItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+    });
+    return html;
+}
+
+// Helper functions for list management
+function addListItem(sectionIndex) {
+    const container = document.getElementById(`list-items-container-${sectionIndex}`);
+    const itemIndex = container.querySelectorAll('.input-group:not([data-sub-item="true"])').length;
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'input-group mb-2';
+    newItem.innerHTML = `
+        <span class="input-group-text">${itemIndex + 1}.</span>
+        <input type="text" class="form-control" id="list-item-${sectionIndex}-${itemIndex}" value="">
+        <button class="btn btn-outline-danger" type="button" onclick="removeListItem(${sectionIndex}, ${itemIndex})">
+            <i class="bi bi-trash"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" onclick="toggleSubList(${sectionIndex}, ${itemIndex})">
+            <i class="bi bi-list"></i>
+        </button>
+    `;
+    container.appendChild(newItem);
+    
+    // Update all item numbers to ensure they're sequential
+    renumberListItems(sectionIndex);
+}
+
+function removeListItem(sectionIndex, itemIndex) {
+    // Get all main items in the container
+    const container = document.getElementById(`list-items-container-${sectionIndex}`);
+    const items = Array.from(container.querySelectorAll('.input-group:not([data-sub-item="true"])'));
+    
+    // Remove the specified item
+    if (itemIndex < items.length) {
+        items[itemIndex].remove();
+        
+        // Also remove any sub-list for this item
+        const subListContainer = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+        if (subListContainer) {
+            subListContainer.remove();
+        }
+        
+        // Renumber all items and update sub-list IDs
+        renumberListItems(sectionIndex);
+    }
+}
+
+// Function to toggle a sub-list for a list item
+function toggleSubList(sectionIndex, itemIndex) {
+    // Check if sub-list container exists
+    let subListContainer = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+    
+    if (!subListContainer) {
+        // Create new sub-list container
+        const listItem = document.getElementById(`list-item-${sectionIndex}-${itemIndex}`).closest('.input-group');
+        
+        subListContainer = document.createElement('div');
+        subListContainer.id = `sub-list-container-${sectionIndex}-${itemIndex}`;
+        subListContainer.className = 'ms-4 mb-2';
+        
+        // Add the container after the list item
+        listItem.parentNode.insertBefore(subListContainer, listItem.nextSibling);
+        
+        // Add the first sub-item
+        addSubListItem(sectionIndex, itemIndex);
+    } else {
+        // Toggle visibility
+        if (subListContainer.style.display === 'none') {
+            subListContainer.style.display = '';
+        } else {
+            subListContainer.style.display = 'none';
+        }
+    }
+}
+
+// Function to add a sub-list item
+function addSubListItem(sectionIndex, itemIndex) {
+    // Find or create the sub-list container
+    let container = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+    if (!container) {
+        container = document.createElement('div');
+        container.id = `sub-list-container-${sectionIndex}-${itemIndex}`;
+        container.className = 'ms-4 mb-2';
+        
+        // Find the list item to append the sub-list after
+        const listItem = document.getElementById(`list-item-${sectionIndex}-${itemIndex}`).closest('.input-group');
+        listItem.parentNode.insertBefore(container, listItem.nextSibling);
+    }
+    
+    const subItems = container.querySelectorAll('.input-group');
+    const subIndex = subItems.length;
+    const letter = String.fromCharCode(97 + subIndex);
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'input-group mb-2';
+    newItem.setAttribute('data-sub-item', 'true');
+    newItem.innerHTML = `
+        <span class="input-group-text">${letter})</span>
+        <input type="text" class="form-control" id="sub-item-${sectionIndex}-${itemIndex}-${subIndex}" value="">
+        <button class="btn btn-outline-danger" type="button" onclick="removeSubListItem(${sectionIndex}, ${itemIndex}, ${subIndex})">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    
+    // Add the new sub-item
+    if (subIndex === 0) {
+        container.appendChild(newItem);
+        
+        // Add button for adding more sub-items
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'btn btn-sm btn-outline-secondary mt-1';
+        addButton.innerHTML = '<i class="bi bi-plus-circle"></i> Add Sub-item';
+        addButton.setAttribute('onclick', `addSubListItem(${sectionIndex}, ${itemIndex})`);
+        container.appendChild(addButton);
+    } else {
+        // Find the button and insert before it
+        const addButton = container.querySelector('button.btn-outline-secondary');
+        container.insertBefore(newItem, addButton);
+    }
+}
+
+// Function to remove a sub-list item
+function removeSubListItem(sectionIndex, itemIndex, subIndex) {
+    const container = document.getElementById(`sub-list-container-${sectionIndex}-${itemIndex}`);
+    const subItems = container.querySelectorAll('.input-group');
+    
+    // Remove the specified item
+    if (subIndex < subItems.length) {
+        subItems[subIndex].remove();
+        
+        // Re-letter the remaining sub-items
+        const remainingItems = container.querySelectorAll('.input-group');
+        remainingItems.forEach((item, idx) => {
+            const letterSpan = item.querySelector('.input-group-text');
+            if (letterSpan) {
+                letterSpan.textContent = `${String.fromCharCode(97 + idx)})`;
+            }
+            
+            // Update the input and button IDs
+            const input = item.querySelector('input');
+            if (input) {
+                input.id = `sub-item-${sectionIndex}-${itemIndex}-${idx}`;
+            }
+            
+            const button = item.querySelector('button');
+            if (button) {
+                button.setAttribute('onclick', `removeSubListItem(${sectionIndex}, ${itemIndex}, ${idx})`);
+            }
+        });
+        
+        // If no more sub-items, remove the container and the button
+        if (remainingItems.length === 0) {
+            container.remove();
+        }
+    }
+}
+
+// Function to renumber list items after adding/removing
+function renumberListItems(sectionIndex) {
+    const container = document.getElementById(`list-items-container-${sectionIndex}`);
+    const mainItems = Array.from(container.querySelectorAll('.input-group:not([data-sub-item="true"])'));
+    
+    mainItems.forEach((item, newIndex) => {
+        // Update number in UI
+        const numberSpan = item.querySelector('.input-group-text');
+        if (numberSpan) {
+            numberSpan.textContent = `${newIndex + 1}.`;
+        }
+        
+        // Get the old index from the input ID
+        const input = item.querySelector('input');
+        const oldIndex = parseInt(input.id.split('-')[2]);
+        
+        // Update input ID
+        input.id = `list-item-${sectionIndex}-${newIndex}`;
+        
+        // Update buttons
+        const buttons = item.querySelectorAll('button');
+        buttons.forEach(button => {
+            if (button.innerHTML.includes('bi-trash')) {
+                button.setAttribute('onclick', `removeListItem(${sectionIndex}, ${newIndex})`);
+            }
+            if (button.innerHTML.includes('bi-list')) {
+                button.setAttribute('onclick', `toggleSubList(${sectionIndex}, ${newIndex})`);
+            }
+        });
+        
+        // Update sub-list container if it exists
+        const oldSubList = document.getElementById(`sub-list-container-${sectionIndex}-${oldIndex}`);
+        if (oldSubList) {
+            oldSubList.id = `sub-list-container-${sectionIndex}-${newIndex}`;
+            
+            // Update sub-list items
+            const subItems = oldSubList.querySelectorAll('.input-group');
+            subItems.forEach((subItem, subIndex) => {
+                // Update input ID
+                const subInput = subItem.querySelector('input');
+                subInput.id = `sub-item-${sectionIndex}-${newIndex}-${subIndex}`;
+                
+                // Update remove button
+                const removeBtn = subItem.querySelector('button');
+                removeBtn.setAttribute('onclick', `removeSubListItem(${sectionIndex}, ${newIndex}, ${subIndex})`);
+            });
+            
+            // Update add button
+            const addSubBtn = oldSubList.querySelector('button.btn-outline-secondary');
+            if (addSubBtn) {
+                addSubBtn.setAttribute('onclick', `addSubListItem(${sectionIndex}, ${newIndex})`);
+            }
+        }
+    });
+}
+
+// Update renderListEditor to include the toggle sub-list button
+function renderListEditor(section, sectionIndex) {
+    let html = `
+        <div class="mb-3">
+            <label class="form-label">List Items:</label>
+            <div id="list-items-container-${sectionIndex}">
+    `;
+    
+    section.list.forEach((item, itemIndex) => {
+        html += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">${itemIndex + 1}.</span>
+                <input type="text" class="form-control" id="list-item-${sectionIndex}-${itemIndex}" value="${item}">
+                <button class="btn btn-outline-danger" type="button" onclick="removeListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleSubList(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        `;
+        
+        // Add sub-list if available
+        if (section.subList && section.subList[itemIndex]) {
+            html += `<div class="ms-4 mb-2" id="sub-list-container-${sectionIndex}-${itemIndex}">`;
+            section.subList[itemIndex].forEach((subItem, subIndex) => {
+                html += `
+                    <div class="input-group mb-2" data-sub-item="true">
+                        <span class="input-group-text">${String.fromCharCode(97 + subIndex)})</span>
+                        <input type="text" class="form-control" id="sub-item-${sectionIndex}-${itemIndex}-${subIndex}" value="${subItem}">
+                        <button class="btn btn-outline-danger" type="button" onclick="removeSubListItem(${sectionIndex}, ${itemIndex}, ${subIndex})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addSubListItem(${sectionIndex}, ${itemIndex})">
+                    <i class="bi bi-plus-circle"></i> Add Sub-item
+                </button>
+            </div>`;
+        }
+    });
+    
+    html += `
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addListItem(${sectionIndex})">
+                <i class="bi bi-plus-circle"></i> Add List Item
+            </button>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Function to save contract editor changes
+function saveContractEditorChanges() {
+    try {
+        // Get the form data to use for generating the structure
+        const formData = collectFormData();
+        
+        // Create a new contract data object with the edited values
+        const editedContractData = {
+            sections: [],
+            acknowledgements: [],
+            kpiSections: []
+        };
+        
+        // Collect edited sections
+        const sectionsContainer = document.getElementById('contractSectionsContainer');
+        const sectionCards = sectionsContainer.querySelectorAll('.card');
+        
+        sectionCards.forEach((card, index) => {
+            const title = document.getElementById(`section-title-${index}`).value;
+            const content = document.getElementById(`section-content-${index}`).value;
+            const useMarkdown = document.getElementById(`useMarkdown-${index}`).checked;
+            
+            const section = {
+                title: title,
+                content: content,
+                useMarkdown: useMarkdown
+            };
+            
+            // Collect list items if they exist
+            const listContainer = document.getElementById(`list-items-container-${index}`);
+            if (listContainer) {
+                const listItems = [];
+                const subListItems = {};
+                
+                // Get all main list items
+                const mainItems = listContainer.querySelectorAll('.input-group:not([data-sub-item="true"])');
+                mainItems.forEach((item, itemIndex) => {
+                    const input = item.querySelector('input');
+                    if (input && input.value.trim()) {
+                        listItems.push(input.value);
+                        
+                        // Check for sub-items
+                        const subContainer = document.getElementById(`sub-list-container-${index}-${itemIndex}`);
+                        if (subContainer) {
+                            const subInputs = subContainer.querySelectorAll('input');
+                            const subItems = [];
+                            subInputs.forEach(subInput => {
+                                if (subInput.value.trim()) {
+                                    subItems.push(subInput.value);
+                                }
+                            });
+                            if (subItems.length > 0) {
+                                subListItems[itemIndex] = subItems;
+                            }
+                        }
+                    }
+                });
+                
+                if (listItems.length > 0) {
+                    section.list = listItems;
+                    if (Object.keys(subListItems).length > 0) {
+                        section.subList = subListItems;
+                    }
+                }
+            }
+            
+            editedContractData.sections.push(section);
+        });
+        
+        // Collect edited acknowledgements
+        const acknowledgementsContainer = document.getElementById('acknowledgementsContainer');
+        const ackTextareas = acknowledgementsContainer.querySelectorAll('textarea');
+        ackTextareas.forEach(textarea => {
+            if (textarea.value.trim()) {
+                editedContractData.acknowledgements.push(textarea.value);
+            }
+        });
+        
+        // Collect edited KPI sections
+        const kpiContainer = document.getElementById('kpiSectionsContainer');
+        const kpiCards = kpiContainer.querySelectorAll('.card');
+        
+        kpiCards.forEach((card, index) => {
+            const title = document.getElementById(`kpi-title-${index}`).value;
+            const itemsContainer = document.getElementById(`kpi-items-container-${index}`);
+            const items = [];
+            
+            const itemInputs = itemsContainer.querySelectorAll('input');
+            itemInputs.forEach(input => {
+                if (input.value.trim()) {
+                    items.push(input.value);
+                }
+            });
+            
+            if (items.length > 0) {
+                editedContractData.kpiSections.push({
+                    title: title,
+                    items: items
+                });
+            }
+        });
+        
+        // Store the edited contract data globally
+        customContractData = editedContractData;
+        
+        // Close the editor modal
+        const editorModal = bootstrap.Modal.getInstance(document.getElementById('contractEditorModal'));
+        if (editorModal) {
+            editorModal.hide();
+        }
+        
+        // Show success alert instead of browser alert
+        showAlert('Contract changes saved successfully!', 'success');
+        
+        // Clear the cached PDF so it regenerates with new data
+        window.generatedPdf = null;
+        
+    } catch (error) {
+        console.error('Error saving contract changes:', error);
+               // Show error alert instead of browser alert
+        showAlert('An error occurred while saving changes. Please try again.', 'danger');
+    }
+}
+
+// Function to show Bootstrap alert
+function showAlert(message, type = 'success') {
+    // Remove any existing alerts
+    const existingAlert = document.querySelector('.custom-alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show custom-alert`;
+    alertDiv.setAttribute('role', 'alert');
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '80px';
+    alertDiv.style.left = '50vw';
+    alertDiv.style.transform = 'translateX(-50%)';
+    alertDiv.style.zIndex = '1030';
+    alertDiv.style.minWidth = '300px';
+    alertDiv.style.maxWidth = '500px';
+    alertDiv.style.transition = 'opacity 0.7s';
+    alertDiv.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Add to body
+    document.body.appendChild(alertDiv);
+
+    // Auto dismiss after 5 seconds with fade out
+    setTimeout(() => {
+        if (alertDiv && alertDiv.parentElement) {
+            alertDiv.style.opacity = '0';
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getInstance(alertDiv);
+                if (bsAlert) {
+                    bsAlert.close();
+                } else {
+                    alertDiv.remove();
+                }
+            }, 700); // Match transition duration
+        }
+    }, 3000);
+}
+
+// Function to add a new KPI item
+function addKpiItem(sectionIndex) {
+    const container = document.getElementById(`kpi-items-container-${sectionIndex}`);
+    const itemIndex = container.querySelectorAll('.input-group').length;
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'input-group mb-2';
+    newItem.innerHTML = `
+        <span class="input-group-text">•</span>
+        <input type="text" class="form-control" id="kpi-item-${sectionIndex}-${itemIndex}" value="">
+        <button class="btn btn-outline-danger" type="button" onclick="removeKpiItem(${sectionIndex}, ${itemIndex})">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    container.appendChild(newItem);
+}
+
+// Function to remove a KPI item
+function removeKpiItem(sectionIndex, itemIndex) {
+    const container = document.getElementById(`kpi-items-container-${sectionIndex}`);
+    const items = Array.from(container.querySelectorAll('.input-group'));
+    
+    // Remove the specified item
+    if (itemIndex < items.length) {
+        items[itemIndex].remove();
+        
+        // Renumber remaining items
+        const remainingItems = container.querySelectorAll('.input-group');
+        remainingItems.forEach((item, idx) => {
+            // Update input ID
+            const input = item.querySelector('input');
+            if (input) {
+                input.id = `kpi-item-${sectionIndex}-${idx}`;
+            }
+            
+            // Update button onclick
+            const button = item.querySelector('button');
+            if (button) {
+                button.setAttribute('onclick', `removeKpiItem(${sectionIndex}, ${idx})`);
+            }
+        });
+    }
 }
