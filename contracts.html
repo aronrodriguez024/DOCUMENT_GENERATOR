@@ -32,7 +32,7 @@
                     <a class="nav-link ps-4" href="contracts.html">Contract</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link ps-4" href="#">Certification</a>
+                    <a class="nav-link ps-4" href="certifications.html">Certification</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link ps-4" href="#">Benefits</a>
@@ -96,7 +96,7 @@
                     <a class="nav-link ps-4 active" href="contracts.html">Contract</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link ps-4" href="#">Certification</a>
+                    <a class="nav-link ps-4" href="certifications.html">Certification</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link ps-4" href="#">Benefits</a>
@@ -649,30 +649,10 @@
             
             // Add weather functionality using Open-Meteo API (completely free, no API key needed)
             function getWeatherData() {
-                // Default coordinates for Makati
-                let latitude = 14.5576;
-                let longitude = 121.0240;
+                const latitude = 14.5576;
+                const longitude = 121.0240;
                 
-                // Try to get user location for more accurate weather
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        // Success callback
-                        function(position) {
-                            latitude = position.coords.latitude;
-                            longitude = position.coords.longitude;
-                            fetchWeather(latitude, longitude);
-                        },
-                        // Error callback
-                        function(error) {
-                            console.log("Geolocation error:", error);
-                            fetchWeather(latitude, longitude); // Use default coordinates
-                        },
-                        { timeout: 5000 }
-                    );
-                } else {
-                    // Fallback to default location if geolocation not available
-                    fetchWeather(latitude, longitude);
-                }
+                fetchWeather(latitude, longitude);
             }
             
             // Fetch weather from Open-Meteo API
