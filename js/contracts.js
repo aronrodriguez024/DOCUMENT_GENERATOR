@@ -568,7 +568,7 @@ async function generateContractPDF(formData, contractData) {
 
     // Helper functions
     function addText(text, x, y, options = {}) {
-      const fontSize = options.fontSize || 9.5;
+      const fontSize = options.fontSize || 9;
       const fontStyle = options.fontStyle || "normal";
       const align = options.align || "left";
 
@@ -589,7 +589,7 @@ async function generateContractPDF(formData, contractData) {
     }
 
     function renderStyledLine(pdf, segments, x, y, options = {}) {
-      const fontSize = options.fontSize || 9.5;
+      const fontSize = options.fontSize || 9;
       const maxWidth = options.maxWidth || pageWidth - margin * 2;
       let currentX = x;
 
@@ -612,7 +612,7 @@ async function generateContractPDF(formData, contractData) {
     }
 
     function addWrappedText(text, x, y, maxWidth, options = {}) {
-      const fontSize = options.fontSize || 9.5;
+      const fontSize = options.fontSize || 9;
       const fontStyle = options.fontStyle || "normal";
       const align = options.align || "justify";
 
@@ -654,7 +654,7 @@ async function generateContractPDF(formData, contractData) {
 
     // Add this function inside generateContractPDF, before its usage:
     function addJustifiedText(pdf, text, x, y, maxWidth, options = {}) {
-      const fontSize = options.fontSize || 9.5;
+      const fontSize = options.fontSize || 9;
       const fontStyle = options.fontStyle || "normal";
       pdf.setFontSize(fontSize);
       pdf.setFont(fontFamily, fontStyle);
@@ -690,7 +690,7 @@ async function generateContractPDF(formData, contractData) {
 
     // Company header
     addText(formData.companyName, 0, yPos, {
-      fontSize: 12,
+      fontSize: 11,
       fontStyle: "bold",
       align: "center",
     });
@@ -701,7 +701,7 @@ async function generateContractPDF(formData, contractData) {
       0,
       yPos,
       {
-        fontSize: 8.5,
+        fontSize: 8,
         align: "center",
       }
     );
@@ -744,7 +744,7 @@ async function generateContractPDF(formData, contractData) {
 
     // Greeting
     addText("Sir/Ma'am;", margin, yPos, {
-      fontSize: 9.5,
+      fontSize: 9,
     });
     yPos += lineHeight * 1.8;
 
@@ -765,7 +765,7 @@ async function generateContractPDF(formData, contractData) {
       margin,
       yPos,
       pageWidth - margin * 2,
-      { fontSize: 9.5, fontFamily: fontFamily }
+      { fontSize: 9, fontFamily: fontFamily }
     );
     yPos += lineHeight * 0.7; // Reduced from 0.9
 
@@ -787,7 +787,7 @@ async function generateContractPDF(formData, contractData) {
           margin,
           yPos,
           pageWidth - margin * 2,
-          { fontSize: 9.5, fontFamily: fontFamily }
+          { fontSize: 9, fontFamily: fontFamily }
         );
       } else {
         yPos = addJustifiedText(
@@ -796,7 +796,7 @@ async function generateContractPDF(formData, contractData) {
           margin,
           yPos,
           pageWidth - margin * 2,
-          { fontSize: 9.5 }
+          { fontSize: 9 }
         );
       }
       yPos += lineHeight * 0.1; // Reduced from 0.2
@@ -811,7 +811,7 @@ async function generateContractPDF(formData, contractData) {
             margin + 20,
             yPos,
             pageWidth - margin * 2 - 20,
-            { fontSize: 9.5 }
+            { fontSize: 9 }
           );
 
           if (section.subList && section.subList[index]) {
@@ -826,7 +826,7 @@ async function generateContractPDF(formData, contractData) {
                 margin + 35,
                 yPos,
                 pageWidth - margin * 2 - 35,
-                { fontSize: 9.5 }
+                { fontSize: 9 }
               );
               yPos += lineHeight * 0.15; // Reduced from 0.25
             });
@@ -847,7 +847,7 @@ async function generateContractPDF(formData, contractData) {
       margin,
       yPos,
       pageWidth - margin * 2,
-      { fontSize: 9.5 }
+      { fontSize: 9 }
     );
     yPos += lineHeight * 1.4; // Reduced from 1.8
 
@@ -870,12 +870,12 @@ async function generateContractPDF(formData, contractData) {
     // Signatory name and position (always at signatoryBlockY)
     let ySignatory = signatoryBlockY;
     ySignatory = addWrappedText(formData.signatoryName, signatoryBlockX, ySignatory, 200, {
-      fontSize: 9.5,
+      fontSize: 9,
       fontStyle: "bold",
       align: "left",
     });
     ySignatory = addWrappedText(formData.signatoryPosition, signatoryBlockX, ySignatory, 200, {
-      fontSize: 9.5,
+      fontSize: 9,
       align: "left",
     });
     yPos += lineHeight * 5; // spacing after block
@@ -897,7 +897,7 @@ async function generateContractPDF(formData, contractData) {
         margin,
         yPos,
         pageWidth - margin * 2,
-        { fontSize: 9.5 }
+        { fontSize: 9 }
       );
       yPos += lineHeight * 0.9; // Reduced from 1.1
     });
@@ -908,7 +908,7 @@ async function generateContractPDF(formData, contractData) {
     const signatureLines = pdf.splitTextToSize(formData.name.toUpperCase(), signatureMaxWidth);
     signatureLines.forEach((line, i) => {
       addText(line, pageWidth - margin - signatureMaxWidth + 10, yPos + i * lineHeight, {
-        fontSize: 9.5,
+        fontSize: 9,
         fontStyle: "bold",
         align: "left",
       });
@@ -941,7 +941,7 @@ async function generateContractPDF(formData, contractData) {
     yPos += lineHeight;
 
     addText("(Upang magsilbing gabay sa pagtupad ng tungkulin)", 0, yPos, {
-      fontSize: 9.5,
+      fontSize: 9,
       align: "center",
     });
     yPos += lineHeight * 2.5;
@@ -973,7 +973,7 @@ async function generateContractPDF(formData, contractData) {
           margin + 15,
           yPos,
           pageWidth - margin * 2 - 15,
-          { fontSize: 9.5 }
+          { fontSize: 9 }
         );
         yPos += lineHeight * 0.15;
       });
@@ -1186,9 +1186,9 @@ function renderStyledText(pdf, text, x, y, maxWidth, options = {}) {
   const md = initializeMarkdownParser();
   const segments = parseMarkdownForPDF(text, md);
   
-  const fontSize = options.fontSize || 9.5;
+  const fontSize = options.fontSize || 9;
   const fontFamily = options.fontFamily || 'helvetica';
-  const lineHeight = 11; // Reduced from 13 to match the main lineHeight
+  const lineHeight = 11; // Reduced
   let currentY = y;
   
   pdf.setFontSize(fontSize);
