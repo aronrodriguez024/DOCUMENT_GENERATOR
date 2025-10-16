@@ -9,6 +9,18 @@
     transition: transform 0.3s ease-in-out;
 }
 
+@media (max-width: 1136px) and (min-width: 764px) {
+  .custom-hide-img {
+    display: none !important;
+  }
+}
+
+@media (max-width: 763px) {
+  .custom-hide-img {
+    display: block !important;
+  }
+}
+
 .main-content {
 
 }
@@ -149,9 +161,7 @@ label {
     }
 
     .nav-link.active {
-        background-color: #767676;
-        color: white !important;
-        font-weight: bold;
+        background-color: #e4f3ff;
     }
     
     .sidebar-overlay.show {
