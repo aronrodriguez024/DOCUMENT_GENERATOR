@@ -135,11 +135,12 @@
                         <div class="row">
                             <!-- Left side illustration column -->
                             <div class="col-md-4 mb-3 text-center">
-                                <img src="/document_generator/assets/images/weblogo.png" alt="Program Image" class="img-fluid mb-3" style="max-height: 246px;" draggable="false">
+                                <!-- <img src="/document_generator/assets/images/weblogo.png" alt="Program Image" class="img-fluid mb-3" style="max-height: 246px;" draggable="false"> -->
                                 
                                 <!-- Signatory Information -->
                                 <div class="text-start">
                                     <div class="row mb-3">
+                                        <h5>Signatory Information</h5>
                                         <div class="col-md-6">
                                             <label for="signatory-name" class="form-label">Name of Assigned Signatory <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" id="signatory-name" value="FERNANDO B. PANGANIBAN" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();" required>
@@ -156,9 +157,38 @@
                                         </div>
                                     </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="mb-4">
                                         <label for="signatory-position" class="form-label">Position of Assigned Signatory <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="signatory-position" value="HR & Admin Manager" required>
+                                    </div>
+                                    
+                                    <!-- Contact Person Information -->
+                                    <div class="row mb-4">
+                                        <h5>Contact Person Information</h5>
+                                        <div class="col-md-6">
+                                            <label for="contact-person-name" class="form-label">Contact Person Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="contact-person-name" style="text-transform: capitalize;" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="contact-person-number" class="form-label">Contact Person's No. <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">+63</span>
+                                                <input type="tel" class="form-control" id="contact-person-number" pattern="[0-9]{10}" maxlength="10" placeholder="9123456789" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- TIN and SSS Numbers -->
+                                    <div class="row mb-3">
+                                        <h5>TIN and SSS Numbers</h5>
+                                        <div class="col-md-6">
+                                            <label for="tin-number" class="form-label">TIN Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="tin-number" maxlength="11" oninput="this.value = this.value.replace(/[^0-9-]/g, '').slice(0, this.value.includes('-') ? 11 : 9)" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="sss-number" class="form-label">SSS Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="sss-number" maxlength="12" oninput="this.value = this.value.replace(/[^0-9-]/g, '').slice(0, this.value.includes('-') ? 12 : 10)" required>
+                                        </div>
                                     </div>
                                     
                                     
