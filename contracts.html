@@ -161,18 +161,42 @@
                                         <input type="text" class="form-control" id="signatory-position" value="HR & Admin Manager" required>
                                     </div>
                                     
+                                    
                                     <!-- Weather/Date Widget -->
-                                    <div class="card text-white" style="background-color: #879ed7; border: none; margin-top: 30px;">
-                                        <div class="card-body p-2 position-relative" style="position: relative; bottom: 3px;">
-                                            <h1 class="display-5 mb-0">8:00 AM</h1>
-                                            <p class="mb-0">Sunday</p>
-                                            <p class="mb-0">October 05, 2025</p>
-                                            <div class="position-absolute top-0 end-0 m-2 text-end">
-                                                <i id="weatherIcon" class="bi bi-question-circle fs-1 text-white"></i>
-                                                <div class="mt-1">
-                                                    <div class="h5 mb-0" id="temperature" style="position: relative; bottom: 12px; font-size: 19px;">--°C</div>
-                                                    <small id="location" style="position: relative; bottom: 6px; font-size: small;">Loading..</small>
+                                    <div class="card" style="border: 1px solid #879ed7; margin-top: 30px; border-radius: 16px; padding: 0; color: #879ed7; position: relative; bottom: 6px">
+                                        <div class="card-body d-flex justify-content-between align-items-center" style="gap: 10px; padding: 6px 18px 0px 18px; position: relative; bottom: 6px">
+                                            <!-- Left side: Time and Weather -->
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; gap: 10px; align-items: center;">
+                                                    <!-- Time Section -->
+                                                    <div>
+                                                        <h1 class="mb-0" style="font-size: clamp(42px, 5vw, 64px); font-weight: 300; letter-spacing: -2px; line-height: 1;">
+                                                            <span id="displayTime">00:00</span>
+                                                        </h1>
+                                                    </div>
+                                                    <!-- AM/PM and Date -->
+                                                    <div style="display: flex; flex-direction: column; justify-content: flex-start; gap: 4px;">
+                                                        <span id="displayAMPM" style="font-size: clamp(18px, 2vw, 30px); font-weight: 400; line-height: 1;">PM</span>
+                                                        <p class="mb-0" id="displayDate" style="font-size: clamp(12px, 1vw, 16px); font-weight: 400; line-height: 1.2;">Day MM/DD/YYYY</p>
+                                                    </div>
                                                 </div>
+                                                <!-- Weather Section -->
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div>
+                                                        <i id="weatherIcon" class="bi bi-cloud-slash" style="font-size: 30px; margin-bottom: 20px; margin-left: 6px;"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span id="temperature" class="badge rounded-pill" style="background-color: #f1f3fa; padding: 3px 8px; color: #879ed7">--°C</span>
+                                                        <small id="location" style="font-size: 12px; opacity: 0.9; line-height: 1; display: block;">Loading...</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Right side: Illustration -->
+                                            <div style="flex-shrink: 0;">
+                                                <img src="/document_generator/assets/images/weblogo.png" alt="Illustration" 
+                                                style="height: clamp(60px, 20vw, 120px); width: auto;" 
+                                                draggable="false"
+                                                class="d-none d-xl-block d-md-block custom-hide-img">
                                             </div>
                                         </div>
                                     </div>
@@ -615,35 +639,25 @@
 
             // Weather/Date Widget functionality
             function updateDateTimeWidget() {
-                // Get widget elements
-                const timeElement = document.querySelector('.card .display-5');
-                const dayElement = document.querySelector('.card p:nth-of-type(1)');
-                const dateElement = document.querySelector('.card p:nth-of-type(2)');
-                
-                // Get current date and time
                 const now = new Date();
                 
-                // Update time (12-hour format with AM/PM)
+                // Update time (12-hour format)
                 const hours = now.getHours();
                 const minutes = now.getMinutes();
                 const ampm = hours >= 12 ? 'PM' : 'AM';
-                const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
-                timeElement.textContent = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+                const displayHours = hours % 12 || 12;
+                document.getElementById('displayTime').textContent = `${displayHours}:${minutes.toString().padStart(2, '0')}`;
+                document.getElementById('displayAMPM').textContent = ampm;
                 
-                // Update day of week
-                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                dayElement.textContent = days[now.getDay()];
-                
-                // Update date (Month DD, YYYY format)
-                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                               'July', 'August', 'September', 'October', 'November', 'December'];
-                const month = months[now.getMonth()];
-                const date = now.getDate();
+                // Update date (Wed 10/15/2025 format)
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const dayName = days[now.getDay()];
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const date = String(now.getDate()).padStart(2, '0');
                 const year = now.getFullYear();
-                dateElement.textContent = `${month} ${date}, ${year}`;
+                document.getElementById('displayDate').textContent = `${dayName} ${month}/${date}/${year}`;
             }
             
-            // Initialize date/time widget and update every second
             updateDateTimeWidget();
             setInterval(updateDateTimeWidget, 1000);
             
@@ -740,7 +754,10 @@
                 }
                 
                 // Update only the icon class, keep existing positioning
-                iconElement.className = `bi ${iconClass} fs-1`;
+                iconElement.className = `bi ${iconClass}`;
+                iconElement.style.fontSize = '30px';
+                iconElement.style.marginBottom = '20px';
+                iconElement.style.marginLeft = '6px';
             }
             
             // Initialize weather
