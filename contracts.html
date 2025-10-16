@@ -115,6 +115,35 @@
                 </li>
             </ul>
         </div>
+        <!-- Weather Widget at bottom of sidebar -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; border-top: 1px solid #dee2e6;">
+            <div class="card" id="sidebarWidget" style="border: 1px solid #879ed7; border-radius: 16px; padding: 0; color: #879ed7;">
+                <div class="card-body" style="padding: 12px 15px;">
+                    <!-- Time Section -->
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <div>
+                            <h5 class="mb-0" style="font-size: 28px; font-weight: 300; letter-spacing: -2px;">
+                                <span id="sidebarDisplayTime">00:00</span>
+                            </h5>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <span id="sidebarDisplayAMPM" style="font-size: 14px; font-weight: 400;">PM</span>
+                            <p class="mb-0" id="sidebarDisplayDate" style="font-size: 10px; font-weight: 400;">Day MM/DD</p>
+                        </div>
+                    </div>
+                    <!-- Weather Section -->
+                    <div class="d-flex align-items-center gap-2">
+                        <div>
+                            <i id="sidebarWeatherIcon" class="bi bi-cloud-slash" style="font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <span id="sidebarTemperature" class="badge rounded-pill" style="background-color: #f1f3fa; padding: 2px 6px; color: #879ed7; font-size: 10px;">--°C</span>
+                            <small id="sidebarLocation" style="font-size: 10px; opacity: 0.9; display: block;">Loading...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
     <!-- Sidebar overlay for mobile -->
@@ -193,7 +222,7 @@
                                     
                                     
                                     <!-- Weather/Date Widget -->
-                                    <div class="card" style="border: 1px solid #879ed7; margin-top: 30px; border-radius: 16px; padding: 0; color: #879ed7; position: relative; bottom: 6px">
+                                    <div class="card" id="widget" style="border: 1px solid #879ed7; margin-top: 36px; border-radius: 16px; padding: 0; color: #879ed7;">
                                         <div class="card-body d-flex justify-content-between align-items-center" style="gap: 10px; padding: 6px 18px 0px 18px; position: relative; bottom: 6px">
                                             <!-- Left side: Time and Weather -->
                                             <div style="flex: 1;">
@@ -671,7 +700,7 @@
             function updateDateTimeWidget() {
                 const now = new Date();
                 
-                // Update time (12-hour format)
+                // Update main widget
                 const hours = now.getHours();
                 const minutes = now.getMinutes();
                 const ampm = hours >= 12 ? 'PM' : 'AM';
@@ -679,13 +708,18 @@
                 document.getElementById('displayTime').textContent = `${displayHours}:${minutes.toString().padStart(2, '0')}`;
                 document.getElementById('displayAMPM').textContent = ampm;
                 
-                // Update date (Wed 10/15/2025 format)
+                // Update sidebar widget with same time
+                document.getElementById('sidebarDisplayTime').textContent = `${displayHours}:${minutes.toString().padStart(2, '0')}`;
+                document.getElementById('sidebarDisplayAMPM').textContent = ampm;
+                
+                // Update date
                 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                 const dayName = days[now.getDay()];
                 const month = String(now.getMonth() + 1).padStart(2, '0');
                 const date = String(now.getDate()).padStart(2, '0');
                 const year = now.getFullYear();
                 document.getElementById('displayDate').textContent = `${dayName} ${month}/${date}/${year}`;
+                document.getElementById('sidebarDisplayDate').textContent = `${dayName} ${month}/${date}`;
             }
             
             updateDateTimeWidget();
@@ -705,42 +739,46 @@
                 const temperatureElement = document.getElementById('temperature');
                 const locationElement = document.getElementById('location');
                 
-                // Using Open-Meteo API (free, no key required)
+                // Also update sidebar elements
+                const sidebarWeatherIcon = document.getElementById('sidebarWeatherIcon');
+                const sidebarTemperatureElement = document.getElementById('sidebarTemperature');
+                const sidebarLocationElement = document.getElementById('sidebarLocation');
+                
                 const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature,weather_code&timezone=auto`;
                 
                 fetch(apiUrl)
                     .then(response => response.json())
                     .then(data => {
-                        // Update weather icon based on the weather code
                         updateWeatherIcon(data.current.weather_code, weatherIcon);
+                        updateWeatherIcon(data.current.weather_code, sidebarWeatherIcon);
                         
-                        // Update temperature
                         const temp = Math.round(data.current.temperature);
                         temperatureElement.textContent = `${temp}°C`;
+                        sidebarTemperatureElement.textContent = `${temp}°C`;
                     })
                     .catch(error => {
                         console.error("Weather API error:", error);
                     });
                 
-                // Get location name using reverse geocoding
                 const geocodeUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
                 
                 fetch(geocodeUrl)
                     .then(response => response.json())
                     .then(data => {
-                        // Clean up the location data to avoid unwanted text like "(the)"
                         let city = data.city || data.locality || data.principalSubdivision || 'Unknown City';
                         let country = data.countryName || 'Unknown Country';
                         
-                        // Remove any parenthetical information from city name
                         city = city.replace(/\s*\([^)]*\)/g, '').trim();
                         country = country.replace(/\s*\([^)]*\)/g, '').trim();
                         
-                        locationElement.textContent = `${city}, ${country}`;
+                        const location = `${city}, ${country}`;
+                        locationElement.textContent = location;
+                        sidebarLocationElement.textContent = location;
                     })
                     .catch(error => {
                         console.error("Geocoding error:", error);
-                        locationElement.textContent = "Unknown Location"; // Fallback
+                        locationElement.textContent = "Unknown Location";
+                        sidebarLocationElement.textContent = "Unknown Location";
                     });
             }
             
