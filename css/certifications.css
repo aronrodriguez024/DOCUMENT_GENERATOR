@@ -16,8 +16,8 @@
 }
 
 @media (max-width: 763px) {
-  .custom-hide-img {
-    display: block !important;
+  #widget {
+    display: none;
   }
 }
 
@@ -141,6 +141,7 @@ label {
         z-index: 1050;
         top: 0; /* Remove gap by starting from top */
         height: 100vh; /* Full height */
+        padding-bottom: 200px; /* Add space for widget at bottom */
     }
     
     .sidebar.show {
