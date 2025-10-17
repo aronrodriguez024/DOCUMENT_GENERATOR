@@ -981,6 +981,198 @@ async function generateContractPDF(formData, contractData) {
       yPos += lineHeight * 0.4;
     });
 
+    // --- NEW: Add PVC/ID page (matches provided photo) ---
+    async function loadImageDataUrl(url) {
+      try {
+        const res = await fetch(url, { cache: "no-cache" });
+        if (!res.ok) return null;
+        const blob = await res.blob();
+        return await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch (e) {
+        console.warn("Image load failed:", url, e);
+        return null;
+      }
+    }
+
+    // Determine company key and asset paths
+    const companyKey = document.getElementById("company") ? document.getElementById("company").value : null;
+    const tempIdMap = {
+      "trade-marketing": "/document_generator/assets/images/idtemp/TMARKS.png",
+      regcris: "/document_generator/assets/images/idtemp/REGCRIS.png",
+      prestige: "/document_generator/assets/images/idtemp/PRESTIGE.png",
+    };
+    const websiteMap = {
+      "trade-marketing": "https://www.tmarks.com.ph",
+      regcris: "https://www.regcris.com",
+      prestige: "https://www.prestigepromo.org",
+    };
+    const websiteQrMap = {
+      "trade-marketing": "/document_generator/assets/images/qr/tmarks.png",
+      regcris: "/document_generator/assets/images/qr/regcris.png",
+      prestige: "/document_generator/assets/images/qr/prestige.png",
+    };
+    const pvcQrPath = "/document_generator/assets/images/qr/request_for_id.png";
+
+    // Load images (non-blocking if fail)
+    const [
+      tempIdDataUrl,
+      pvcQrDataUrl,
+      websiteQrDataUrl
+    ] = await Promise.all([
+      loadImageDataUrl(tempIdMap[companyKey] || tempIdMap["trade-marketing"]),
+      loadImageDataUrl(pvcQrPath),
+      loadImageDataUrl(websiteQrMap[companyKey] || websiteQrMap["trade-marketing"])
+    ]);
+
+    // Add page and layout similar to photo
+    pdf.addPage();
+    let npY = margin;
+
+    // Top: temporary ID image
+    if (tempIdDataUrl) {
+      // Create an Image object to get natural dimensions
+      const img = new Image();
+      img.src = tempIdDataUrl;
+      await new Promise(resolve => { img.onload = resolve; });
+
+      const naturalWidth = img.width;
+      const naturalHeight = img.height;
+      const maxWidth = 310; 
+      let drawWidth = naturalWidth;
+      let drawHeight = naturalHeight;
+
+      // Scale down if wider than maxWidth
+      if (naturalWidth > maxWidth) {
+        const scale = maxWidth / naturalWidth;
+        drawWidth = maxWidth;
+        drawHeight = naturalHeight * scale;
+      }
+
+      // Center the image horizontally between margins
+      const centerX = margin + ((pageWidth - margin * 2) - drawWidth) / 2;
+
+      pdf.addImage(tempIdDataUrl, "PNG", centerX, npY, drawWidth, drawHeight);
+
+      // Add text in front of the image
+      pdf.setTextColor(255, 255, 255); // Set font color to white
+      const nameMaxWidth = 130; // Adjust as needed for your layout
+      const nameLines = pdf.splitTextToSize(formData.name.toUpperCase(), nameMaxWidth);
+      nameLines.forEach((line, i) => {
+        addText(line, centerX + 10, npY + 136 + (i * 10), {
+          fontSize: 8,
+          align: "justify",
+        });
+      });
+      pdf.setTextColor(0, 0, 0);
+
+      npY += drawHeight + 12;
+    } else {
+      // If image missing, leave blank area
+      npY += 220;
+    }
+
+    // Horizontal separator line
+    pdf.setDrawColor(0);
+    pdf.setLineWidth(0.7);
+    pdf.line(margin, npY, pageWidth - margin, npY);
+    npY += 12;
+
+    // REQUEST FOR PVC ID title (center)
+    npY += 18;
+    addText("REQUEST FOR PVC ID", 0, npY, {
+      fontSize: 14,
+      fontStyle: "bold",
+      align: "center",
+    });
+    npY += lineHeight * 1.6;
+
+    // Left column: large QR box for PVC ID
+    const leftColX = margin + 10;
+    const leftColW = 160;
+    const qrBoxSize = 120;
+    const leftQrY = npY - 20;
+
+    // If we have pvc qr, place it inside
+    if (pvcQrDataUrl) {
+      pdf.addImage(pvcQrDataUrl, "PNG", leftColX + 8, leftQrY + 8, qrBoxSize - 16, qrBoxSize - 16);
+    }
+
+    // Right column: instructions text
+    const rightColX = leftColX + leftColW + 20;
+    const rightColW = pageWidth - margin - rightColX;
+    const instructions = [
+      "Important notes:",
+      "• Pay P100 to Company's Bank Account for the ID",
+      "• You may use your GCash Account to pay via Bank Transfer.",
+      "",
+      "How?",
+      "• Open your GCash account and go to \"Transfer\"",
+      "• Select \"Local\" and choose Unionbank",
+      "• Type the following information:",
+      `  - Amount: P100`,
+      `  - Account Name: ${formData.companyName || ""}`,
+      "  - Account Number: 001230011162"
+    ].join("\n");
+
+    npY = addWrappedText(instructions, rightColX, npY, rightColW, { fontSize: 9, align: "left" });
+    npY += lineHeight * 0.5;
+
+    // Next section: Visit company website
+    npY += lineHeight * 6.2;
+    addText("VISIT COMPANY WEBSITE!", 0, npY, {
+      fontSize: 14,
+      fontStyle: "bold",
+      align: "center",
+    });
+    npY += lineHeight * 1.2;
+    addText(`${websiteMap[companyKey] || websiteMap["trade-marketing"]}`, 0, npY, {
+      fontSize: 10,
+      align: "center",
+    });
+    npY += lineHeight * 1.6;
+
+    // Place website QR on right side
+    const webQrSize = 100;
+    const webQrX = pageWidth - margin - webQrSize;
+    const webQrY = npY - webQrSize + 30; // align visually
+    if (websiteQrDataUrl) {
+      pdf.addImage(websiteQrDataUrl, "PNG", webQrX, webQrY, webQrSize, webQrSize);
+    } else {
+      if (typeof pdf.roundedRect === "function") {
+        pdf.roundedRect(webQrX, webQrY, webQrSize, webQrSize, 8, 8);
+      } else {
+        pdf.rect(webQrX, webQrY, webQrSize, webQrSize);
+      }
+    }
+
+    // Bottom: 3 scan boxes (two left + one right) and placeholder text center
+    const bottomStartY = Math.max(npY + webQrSize + 20, leftQrY + qrBoxSize + 120) - 80;
+    const smallBoxSize = 110;
+    const box1X = margin + 10;
+
+    // Box 1
+    if (typeof pdf.roundedRect === "function") {
+      pdf.roundedRect(box1X, bottomStartY, smallBoxSize, smallBoxSize, 10, 10);
+    } else {
+      pdf.rect(box1X, bottomStartY, smallBoxSize, smallBoxSize);
+    }
+    addText("INSERT QR HERE", box1X + 6, bottomStartY + smallBoxSize + 16, { fontSize: 9, fontStyle: "bold" });
+
+    // Center placeholder text above bottom boxes
+    const placeholderY = bottomStartY + 60;
+    addText("PLACEHOLDER TEXT", 0, placeholderY, {
+      fontSize: 14,
+      align: "center",
+    });
+
+    // Ensure final spacing
+    yPos = pageHeight - margin;
+    // --- END NEW PAGE ---
+
     return pdf;
   } catch (error) {
     console.error("PDF generation error:", error);
