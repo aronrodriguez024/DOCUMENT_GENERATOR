@@ -9,6 +9,18 @@
     transition: transform 0.3s ease-in-out;
 }
 
+@media (max-width: 1136px) and (min-width: 764px) {
+  .custom-hide-img {
+    display: none !important;
+  }
+}
+
+@media (max-width: 763px) {
+  #widget {
+    display: none;
+  }
+}
+
 .main-content {
 
 }
@@ -129,6 +141,7 @@ label {
         z-index: 1050;
         top: 0; /* Remove gap by starting from top */
         height: 100vh; /* Full height */
+        padding-bottom: 200px; /* Add space for widget at bottom */
     }
     
     .sidebar.show {
