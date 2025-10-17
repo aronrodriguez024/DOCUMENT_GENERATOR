@@ -1041,7 +1041,7 @@ async function generateContractPDF(formData, contractData) {
 
       const naturalWidth = img.width;
       const naturalHeight = img.height;
-      const maxWidth = 310; 
+      const maxWidth = 320; 
       let drawWidth = naturalWidth;
       let drawHeight = naturalHeight;
 
