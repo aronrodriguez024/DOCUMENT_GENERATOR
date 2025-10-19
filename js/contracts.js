@@ -32,6 +32,10 @@ function collectFormData() {
   const salary = parseFloat(document.getElementById("salary").value).toFixed(2);
   const signatoryName = document.getElementById("signatory-name").value;
   const signatoryPosition = document.getElementById("signatory-position").value;
+  const sssNumber = document.getElementById("sss-number").value;
+  const tinNumber = document.getElementById("tin-number").value;
+  const contactpersonName = document.getElementById("contact-person-name").value;
+  const contactpersonNumber = document.getElementById("contact-person-number").value;
 
   // Format start date
   const formattedStartDate = startDate.toLocaleString("en-US", {
@@ -85,6 +89,10 @@ function collectFormData() {
     signatoryName,
     signatoryPosition,
     signatureImageDataUrl,
+    sssNumber,
+    tinNumber,
+    contactpersonName,
+    contactpersonNumber,
   };
 }
 
@@ -1041,7 +1049,7 @@ async function generateContractPDF(formData, contractData) {
 
       const naturalWidth = img.width;
       const naturalHeight = img.height;
-      const maxWidth = 320; 
+      const maxWidth = 310; 
       let drawWidth = naturalWidth;
       let drawHeight = naturalHeight;
 
@@ -1057,16 +1065,178 @@ async function generateContractPDF(formData, contractData) {
 
       pdf.addImage(tempIdDataUrl, "PNG", centerX, npY, drawWidth, drawHeight);
 
-      // Add text in front of the image
-      pdf.setTextColor(255, 255, 255); // Set font color to white
-      const nameMaxWidth = 130; // Adjust as needed for your layout
-      const nameLines = pdf.splitTextToSize(formData.name.toUpperCase(), nameMaxWidth);
+      // Add name text in front of the image
+      pdf.setFontSize(8);
+      pdf.setFont(undefined, "bold");
+      pdf.setTextColor(255, 255, 255);
+      const nameMaxWidth = 130;
+
+      // Format name as "Last name, First name Middle name"
+      function formatName(name) {
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 0) return "";
+        
+        // Common multi-word surname prefixes in Filipino names
+        const surnamePrefix = ['DE', 'DEL', 'DELA', 'DELOS', 'LAS', 'LOS', 'SAN', 'SANTA', 'VAN', 'VON', 'MC', 'MAC'];
+        
+        let firstNameEndIndex = 0;
+        let last = "";
+        let first = "";
+        let middle = "";
+        
+        // Check if second word is a surname prefix
+        if (parts.length >= 3 && surnamePrefix.includes(parts[1].toUpperCase())) {
+          // Multi-word surname detected (e.g., "Juan Dela Cruz")
+          first = parts[0];
+          last = parts.slice(1).join(" ");
+          middle = "";
+        } else if (parts.length === 2) {
+          // Simple two-part name
+          first = parts[0];
+          last = parts[1];
+          middle = "";
+        } else if (parts.length >= 3) {
+          // Check if last two words form surname (e.g., "Juan Carlos Dela Cruz")
+          if (surnamePrefix.includes(parts[parts.length - 2].toUpperCase())) {
+            first = parts[0];
+            middle = parts.slice(1, -2).join(" ");
+            last = parts.slice(-2).join(" ");
+          } else {
+            // Standard format: first [middle...] last
+            first = parts[0];
+            middle = parts.slice(1, -1).join(" ");
+            last = parts[parts.length - 1];
+          }
+        } else {
+          // Single name
+          first = parts[0];
+          last = parts[0];
+        }
+        
+        let formatted = `${last.toUpperCase()}, ${first.toUpperCase()}`;
+        if (middle) formatted += ` ${middle.toUpperCase()}`;
+        return formatted;
+      }
+
+      const formattedName = formatName(formData.name);
+      const nameLines = pdf.splitTextToSize(formattedName, nameMaxWidth);
+
+      // Adjust vertical position based on number of lines
+      let nameY;
+      if (nameLines.length === 1) {
+        nameY = npY + 140;
+      } else if (nameLines.length === 2) {
+        nameY = npY + 136;
+      } else {
+        nameY = npY + 130;
+      }
+
+      const nameX = centerX + 80;
+
+      // Draw name lines (white, bold, over image)
       nameLines.forEach((line, i) => {
-        addText(line, centerX + 10, npY + 136 + (i * 10), {
-          fontSize: 8,
-          align: "justify",
-        });
+        pdf.text(line, nameX, nameY + i * 10, { align: "center" });
       });
+
+      // Draw address at a fixed vertical position, not affected by name lines
+      pdf.setFontSize(8); // Smaller font for address
+      pdf.setFont(undefined, "normal");
+      pdf.setTextColor(0, 0, 0);
+      const addressMaxWidth = 130;
+      const addressLines = pdf.splitTextToSize(toCapitalizedWords(formData.address), addressMaxWidth);
+
+      // Set addressY to a fixed value below the image
+      let addressY = npY + 180; 
+      const addressX = centerX + 80;
+
+      addressLines.forEach((line, i) => {
+        pdf.text(line, addressX, addressY + i * 8, { align: "center" });
+      });
+
+      // Add SSS Number and TIN Number at FIXED positions (not affected by address length)
+      pdf.setFontSize(7);
+      pdf.setFont(undefined, "normal");
+      pdf.setTextColor(0, 0, 0);
+      const sssY = npY + 214; // Fixed position regardless of address length
+      const sssX = centerX + 20;   // Move SSS a bit to the left
+      const tinX = centerX + 92;   // Move TIN a bit to the right
+
+      function formatSSSNumber(sss) {
+        const digits = sss.replace(/\D/g, '').padStart(10, '0');
+        return `${digits.slice(0,2)}-${digits.slice(2,9)}-${digits.slice(9,10)}`;
+      }
+
+      function formatTINNumber(tin) {
+        const digits = tin.replace(/\D/g, '');
+        if (digits.length >= 9) {
+          return `${digits.slice(0,3)}-${digits.slice(3,6)}-${digits.slice(6,9)}${digits.length > 9 ? '-' + digits.slice(9) : ''}`;
+        }
+        return tin;
+      }
+
+      // Draw SSS and TIN at fixed positions
+      pdf.text(formatSSSNumber(formData.sssNumber), sssX, sssY, { align: "left" });
+      pdf.text(formatTINNumber(formData.tinNumber), tinX, sssY, { align: "left" });
+
+      // Add position at a fixed position below SSS and TIN
+      pdf.setFontSize(8);
+      pdf.setFont(undefined, "bold");
+      pdf.setTextColor(0, 0, 0);
+      const positionMaxWidth = 140; // Set your desired max width in points
+      const positionLines = pdf.splitTextToSize(formData.position.toUpperCase(), positionMaxWidth);
+
+      // Fixed base position for position text, with adjustment only for its own multi-line
+      const basePositionY = npY + 236; // Fixed position
+      const positionY =
+        positionLines.length === 1
+          ? basePositionY
+          : basePositionY - (positionLines.length - 1) * 4;
+
+      const positionX = centerX + 78; // Center between SSS and TIN
+
+      positionLines.forEach((line, i) => {
+        pdf.text(line, positionX, positionY + i * 10, { align: "center" });
+      });
+
+      // Contact person name and number at fixed positions
+      pdf.setFontSize(7.5);
+      pdf.setFont(undefined, "normal");
+      const contactMaxWidth = 85;
+      const contactY = npY + 178; // Fixed position regardless of other elements
+
+      // Split contact person name and number into lines if too long
+      const contactNameLines = pdf.splitTextToSize(toCapitalizedWords(formData.contactpersonName), contactMaxWidth);
+      const contactNumberLines = pdf.splitTextToSize(
+        toCapitalizedWords(
+          formData.contactpersonNumber.startsWith("0")
+            ? formData.contactpersonNumber
+            : "0" + formData.contactpersonNumber
+        ),
+        contactMaxWidth
+      );
+
+      // Draw each line, adjusting Y for multiple lines
+      const contactNameX = centerX + 205;
+      const contactNumberX = centerX + 278;
+      const lineSpacing = 8;
+
+      const contactNameY =
+        contactNameLines.length === 1
+          ? contactY + 4 // Move down slightly if only 1 line
+          : contactY - (contactNameLines.length - 1) * (lineSpacing / 10);
+      const contactNumberY = contactY + 4;    // adjust this value to move number down (e.g., +12), or up (e.g., -4)
+
+      const maxLines = Math.max(contactNameLines.length, contactNumberLines.length);
+      for (let i = 0; i < maxLines; i++) {
+        if (contactNameLines[i]) {
+          pdf.text(contactNameLines[i], contactNameX, contactNameY + i * lineSpacing, { align: "center" });
+        }
+        if (contactNumberLines[i]) {
+          pdf.text(contactNumberLines[i], contactNumberX, contactNumberY + i * lineSpacing, { align: "center" });
+        }
+      }
+
+      pdf.setFont(undefined, "normal");
       pdf.setTextColor(0, 0, 0);
 
       npY += drawHeight + 12;
