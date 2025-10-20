@@ -72,6 +72,7 @@ function collectFormData() {
     companyName,
     companyAddress,
     employmentType,
+    employmentTypeValue,
     name,
     address,
     email,
@@ -162,8 +163,10 @@ function generateContractData(formData) {
   const sections = [
     {
       title: "Employment Status",
-      content: `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
-      useMarkdown: true,
+      content: formData.employmentTypeValue === 'REGULARIZATION'  // CHANGE THIS LINE
+        ? `As regular employee, you are expected to show consistency of good performance while you are employed. Your performance will be regularly evaluated based on the Gabay sa Pagtupad ng Tungkulin outlined in Annex "A".`
+        : `Your probationary employment shall be for a period of not more than six (6) months from **${formData.formattedStartDate}** to **${formData.formattedEndDate}.** Your continued employment after the probation period will depend on your performance and your ability to meet the company's reasonable standards. Your performance will be regularly evaluated based on the Key Performance Factors and Expectations outlined in Annex "A" of this contract.`,
+      useMarkdown: formData.employmentTypeValue === 'REGULARIZATION' ? false : true,  // CHANGE THIS LINE
     },
     {
       title: "Compensation and Benefits",
@@ -1198,11 +1201,26 @@ async function generateContractPDF(formData, contractData) {
         pdf.text(line, positionX, positionY + i * 10, { align: "center" });
       });
 
+
+
       // Contact person name and number at fixed positions
       pdf.setFontSize(7.5);
       pdf.setFont(undefined, "normal");
       const contactMaxWidth = 85;
       const contactY = npY + 178; // Fixed position regardless of other elements
+
+      // Add "Temporary ID" label at fixed position above contact person info
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, "bold");
+      pdf.setTextColor(255, 255, 255); // White text
+      const tempIdLabelY = npY + 25; // Fixed position above contact info
+      const tempIdLabelX = centerX + 235; // Center it with contact info
+      pdf.text("Temporary ID", tempIdLabelX, tempIdLabelY, { align: "center" });
+
+      // Reset text color and font for contact info
+      pdf.setFontSize(7.5);
+      pdf.setFont(undefined, "normal");
+      pdf.setTextColor(0, 0, 0);
 
       // Split contact person name and number into lines if too long
       const contactNameLines = pdf.splitTextToSize(toCapitalizedWords(formData.contactpersonName), contactMaxWidth);
