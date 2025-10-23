@@ -82,7 +82,7 @@
         <!-- Logo section for mobile -->
         <div class="sidebar-header d-md-none">
             <div class="d-flex align-items-left justify-content-between p-3">
-                <img id="companyLogoSidebar" src="/document_generator/assets/images/icon.png" alt="Logo" style="height: 28px; width: auto; margin: 0; padding: 0; cursor:pointer;" onclick="location.href='about.html';" draggable="false">
+                <img id="companyLogoSidebar" src="/document_generator/assets/images/icon.png" alt="Logo" style="height: 28px; width: auto; margin: 0; padding: 0; cursor:pointer;" onclick="location.reload();" draggable="false">
                 <span class="navbar-brand mb-0">Document Automation</span>
                 <button type="button" class="btn-close" id="sidebarClose" aria-label="Close sidebar"></button>
             </div>
@@ -871,6 +871,9 @@
                     if (formData[key] !== undefined) {
                         if (field.type === 'checkbox' || field.type === 'radio') {
                             field.checked = formData[key];
+                        } else if (field.type === 'file') {
+                            // Only allow clearing the file input
+                            field.value = '';
                         } else {
                             field.value = formData[key];
                         }
@@ -967,29 +970,23 @@
     }
 
     function formatSSSNumber(input) {
-        // Remove all non-digits
         let value = input.value.replace(/\D/g, '');
-        
+
         // Limit to 10 digits
-        if (value.length > 10) {
-            value = value.substring(0, 10);
-        }
-        
-        // Format with dashes
+        if (value.length > 10) value = value.substring(0, 10);
+
+        // Build formatted string step by step
+        let formatted = '';
         if (value.length > 0) {
-            // Add first dash
-            if (value.length > 2) {
-                value = value.substring(0, 2) + '-' + value.substring(2);
-            }
-            
-            // Add second dash
-            if (value.length > 9) { // Adjusted for the first dash
-                value = value.substring(0, 10) + '-' + value.substring(10);
+            formatted += value.substring(0, 2);
+            if (value.length >= 3) {
+                formatted += '-' + value.substring(2, 9);
+                if (value.length >= 10) {
+                    formatted += '-' + value.substring(9, 10);
+                }
             }
         }
-        
-        // Set the formatted value
-        input.value = value;
+        input.value = formatted;
     }
 
     // Update the existing validation functions
