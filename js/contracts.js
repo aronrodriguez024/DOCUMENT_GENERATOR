@@ -233,63 +233,129 @@ function generateContractData(formData) {
     "Finally, I acknowledge that dishonesty, falsification, or misrepresentation of information I have provided in my application or related documents shall constitute sufficient ground for termination of my employment.",
   ];
 
-  const kpiSections = [
-    {
-      title: "ATTENDANCE (30%)",
-      items: [
-        "Regular na pumapasok at nasa tamang oras.",
-        "Nagpapaalam nang mas maaga kung may planong umabsent. Tinatapos ang lahat ng gawain lalo na kung nagbabalak umabsent.",
-      ],
-    },
-    {
-      title: "REPORTS (15%)",
-      items: [
-        "Nagsusubmit ng mga required na report sa takdang panahon (OSA, Inventory, price survey, SOS, etc).",
-        "Nagbibigay ng tamang report (accurate) sa supervisor o coordinator.",
-        "Sinisiguro na naipa-alam sa supervisor or coordinator ang mga out of stock na item sa tindahan.",
-        "Nagpadala ng DTR sa takdang araw.",
-      ],
-    },
-    {
-      title: "PLANOGRAM AND MERCHANDISING MATERIALS (15%)",
-      items: [
-        "Epektibo at consistent na naha-highlight ang mga New Products Initiatives ayon sa ibinibigay na Merchandising Guide at Planograms.",
-        "Nakapagbibigay ng tamang feedback kung ang pinagkasunduang PLANOGRAM O SHARE OF SHELF ay nasusunod o hindi.",
-        "Kabisado ng buong layout ng store at kung nasaan ang produkto sa tindahan.",
-        "Na-install ng tama, maayos at maganda ang mga merchandising materials.",
-      ],
-    },
-    {
-      title: "MERCHANDISING (15%)",
-      items: [
-        "Tinitiyak na nakadisplay ang lahat ng brands, variants, pack sizes na available sa tindahan.",
-        "Sinisiguro na lahat ng produkto ay may tama at napapanahong presyo.",
-        "Pinapanatili at sinusunod ang First-In, First-Out (FIFO) at First-Expiry, First-Out (FEFO) sa lahat ng produkto.",
-        "Pinapanatili ang kalinisan ng produkto at ang mga pinaglalagyan nito.",
-      ],
-    },
-    {
-      title: "RETURNS (10%)",
-      items: [
-        "Nalalaman ang dami ng return sa hawk na tindahan at mga dahilan. Nagbibigay ng near expiry report sa tinakdang deadline.",
-      ],
-    },
-    {
-      title: "FEEDBACK (10%)",
-      items: [
-        "Aktibo sa lahat ng Group Chat (GC), mabilis sumagot at nagbibigay ng feedback.",
-        "Sumusunod sa instructions at consistent na nagagawa ang lahat ng task na ibinigay ng mga nakakataas sa kanya.",
-      ],
-    },
-    {
-      title: "PERSONALITY (5%)",
-      items: [
-        "Pagsusuot ng malinis at maayos na itinakdang kasuotan o uniforme pati na ang pagsusuot parati ng I.D.",
-        "Palaging ginagawang presentable, malinis at kaaya-ayang hitsura tulad ng regular na pagpapa-gupit ng buhok at pag-aahit ng balbas at bigote kung lalake at kung babae naman ay palaging nakapusod o maayos na buhok at pananamit.",
-        "May malasakit sa kompanya at paggalang sa mga nakakataas o mga opisyales ng kompanya, tindahan at kliyente.",
-      ],
-    },
-  ];
+  let kpiSections;
+  if (positionLevel === 'SUPERVISORY') {
+    kpiSections = [
+      {
+        title: "ATTENDANCE (10%)",
+        items: [
+          "Reports regularly and arrives on time.",
+          "Provides advance notice if planning to divert rota.",
+          "Provides advance notice for planned absences or vacation leave.",
+          "Completes all task especially when anticipating an absence.",
+        ],
+      },
+      {
+        title: "REPORTS (20%)",
+        items: [
+          "Submits all area reports within deadlines.",
+          "Provides timely updates on merchandising activities, including valuable insights and suggestions.",
+          "Submits subodrinates (Merchandisers) on schedule.",
+          "Ensures submission of Mannning Reports, MCP, DAP and appropriate Store Scorecards for each outlet.",
+        ],
+      },
+      {
+        title: "DEPLOYMENT AND SUPERVISION (20%)",
+        items: [
+          "Maintains 95% deployment rate in assigned area.",
+          "Monitors merchandisers attendance and ensure at least 95% of attendance is achieved.",
+          "Conducts orientation and provides support to all merchandisers particularly the new one.",
+          "See to it that all subordinates have Employment Contract, Company ID, ATM accounts and that no one is still receiving salary more than twice since hired.",
+          "Exercise proper discipline over merchandisers who commit violations by counseling, verbal and written, incident reports and to request for appropriate disciplinary memos form HR Department.",
+        ],
+      },
+      {
+        title: "MERCHANDISING PLANOGRAM AND COVERAGE (20%)",
+        items: [
+          "Demonstrate full familiarity with the store.",
+          "Effectively and consistently highlights New Product Initiatives in line with merchandising guidelines and planogarams.",
+          "Installs merchandising materials correctly, neatly, and attractively.",
+          "Provide feedback on adherence to agreed planograms and share of shelf.",
+          "Ensures compliance with MCP.",
+        ],
+      },
+      {
+        title: "RETURNS (10%)",
+        items: [
+          "Monitor product returns and provide reasons to and suggest to help reduce them.",
+          "Track near-expiry item and submits required reports within the set deadlines.",
+        ],
+      },
+      {
+        title: "FEEDBACK (15%)",
+        items: [
+          "Actively participate in all group chats, responds promptly and provide necessary feedback.",
+          "Follow instructions and consistently competes assigned task.",
+        ],
+      },
+      {
+        title: "PERSONALITY (5%)",
+        items: [
+          "Exemplifies professionalism by wearing clean and proper prescibed attire or uniform, as well as always wearing the company ID.",
+          "Maintaining a presentable, neat, and pleasant appearance — such as having regular haircuts and shaving for male employees, and keeping the hair neatly tied or properly groomed and dressed for female employees.",
+          "Demonstrating concern for the company and showing respect to superiors, company officials, store personel, and clients.",
+        ],
+      },
+    ];
+  } else {
+    kpiSections = [
+      {
+        title: "ATTENDANCE (30%)",
+        items: [
+          "Regular na pumapasok at nasa tamang oras.",
+          "Nagpapaalam nang mas maaga kung may planong umabsent. Tinatapos ang lahat ng gawain lalo na kung nagbabalak umabsent.",
+        ],
+      },
+      {
+        title: "REPORTS (15%)",
+        items: [
+          "Nagsusubmit ng mga required na report sa takdang panahon (OSA, Inventory, price survey, SOS, etc).",
+          "Nagbibigay ng tamang report (accurate) sa supervisor o coordinator.",
+          "Sinisiguro na naipa-alam sa supervisor or coordinator ang mga out of stock na item sa tindahan.",
+          "Nagpadala ng DTR sa takdang araw.",
+        ],
+      },
+      {
+        title: "PLANOGRAM AND MERCHANDISING MATERIALS (15%)",
+        items: [
+          "Epektibo at consistent na naha-highlight ang mga New Products Initiatives ayon sa ibinibigay na Merchandising Guide at Planograms.",
+          "Nakapagbibigay ng tamang feedback kung ang pinagkasunduang PLANOGRAM O SHARE OF SHELF ay nasusunod o hindi.",
+          "Kabisado ng buong layout ng store at kung nasaan ang produkto sa tindahan.",
+          "Na-install ng tama, maayos at maganda ang mga merchandising materials.",
+        ],
+      },
+      {
+        title: "MERCHANDISING (15%)",
+        items: [
+          "Tinitiyak na nakadisplay ang lahat ng brands, variants, pack sizes na available sa tindahan.",
+          "Sinisiguro na lahat ng produkto ay may tama at napapanahong presyo.",
+          "Pinapanatili at sinusunod ang First-In, First-Out (FIFO) at First-Expiry, First-Out (FEFO) sa lahat ng produkto.",
+          "Pinapanatili ang kalinisan ng produkto at ang mga pinaglalagyan nito.",
+        ],
+      },
+      {
+        title: "RETURNS (10%)",
+        items: [
+          "Nalalaman ang dami ng return sa hawk na tindahan at mga dahilan. Nagbibigay ng near expiry report sa tinakdang deadline.",
+        ],
+      },
+      {
+        title: "FEEDBACK (10%)",
+        items: [
+          "Aktibo sa lahat ng Group Chat (GC), mabilis sumagot at nagbibigay ng feedback.",
+          "Sumusunod sa instructions at consistent na nagagawa ang lahat ng task na ibinigay ng mga nakakataas sa kanya.",
+        ],
+      },
+      {
+        title: "PERSONALITY (5%)",
+        items: [
+          "Pagsusuot ng malinis at maayos na itinakdang kasuotan o uniforme pati na ang pagsusuot parati ng I.D.",
+          "Palaging ginagawang presentable, malinis at kaaya-ayang hitsura tulad ng regular na pagpapa-gupit ng buhok at pag-aahit ng balbas at bigote kung lalake at kung babae naman ay palaging nakapusod o maayos na buhok at pananamit.",
+          "May malasakit sa kompanya at paggalang sa mga nakakataas o mga opisyales ng kompanya, tindahan at kliyente.",
+        ],
+      },
+    ];
+  }
 
   return { sections, acknowledgements, kpiSections };
 }
@@ -951,9 +1017,14 @@ async function generateContractPDF(formData, contractData) {
     });
     yPos += lineHeight;
 
-    addText("(Upang magsilbing gabay sa pagtupad ng tungkulin)", 0, yPos, {
-      fontSize: 9,
-      align: "center",
+    const positionLevel = document.getElementById('position-level').value;
+    const annexSubtitle = positionLevel === 'SUPERVISORY'
+    ? "(To serve as guide in carrying out responsibilities)"
+    : "(Upang magsilbing gabay sa pagtupad ng tungkulin)";
+
+    addText(annexSubtitle, 0, yPos, {
+    fontSize: 9,
+    align: "center",
     });
     yPos += lineHeight * 2.5;
 
