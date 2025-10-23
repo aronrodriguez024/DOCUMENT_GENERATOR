@@ -1,4 +1,4 @@
-# Document Generator Pro
+# Document Automation Generator
 
 A dynamic, client-side web application for efficiently generating standardized employee contracts. This tool is designed for HR and administrative professionals to create, preview, and download print-ready PDF contracts with ease.
 
